@@ -18,8 +18,12 @@ const deleteUser = () => {
   // TODO: Implement
 };
 
+// queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
+const getUser = async (queryObject) => User.findOne(queryObject);
+
 module.exports = {
   createUser,
   deleteUser,
   authenticateUser,
+  getUser,
 };

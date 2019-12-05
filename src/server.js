@@ -1,6 +1,6 @@
 const express = require('express');
 require('./db');
-const { createUser, authenticateUser } = require('./lib/user');
+const { createUser, authenticateUser, getUser } = require('./lib/user');
 
 const app = express();
 const port = 3000;
@@ -23,6 +23,33 @@ app.get('/register', async (req, res) => {
   const user = await createUser(newUser);
   res.send(`new user created with username ${user.username}`);
 });
+
+
+// check if username unique -> true means username is unique
+app.use(async (req, res, next) => {
+  const { username } = req.query;
+  const user = await getUser({ username });
+  if (user) {
+    return res.send(false);
+  }
+  return next();
+});
+
+app.get('/uniqueUsername', (req, res) => res.send(true));
+
+
+// check if email unique -> true means email is unique
+app.use(async (req, res, next) => {
+  const { email } = req.query;
+  const user = await getUser({ email });
+
+  if (user) {
+    return res.send(false);
+  }
+  return next();
+});
+
+app.get('/uniqueEmail', (req, res) => res.send(true));
 
 app.use(async (req, res, next) => {
   const { username, password } = req.query;
