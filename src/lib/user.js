@@ -1,10 +1,8 @@
 const { compare } = require('../util/bcrypt');
 const { User } = require('../models');
 
-const createUser = async (name, username, email, password) => {
-  const newUser = new User({
-    name, username, email, password,
-  });
+const createUser = async (userObj) => {
+  const newUser = new User(userObj);
   await newUser.save();
   return newUser;
 };

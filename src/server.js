@@ -11,7 +11,16 @@ app.get('/register', async (req, res) => {
   // user needs unique entries for database for email and username
   // used dummy number to ensure uniqueness
   const randomStringNumber = String(Math.round(Math.random() * 10000));
-  const user = await createUser('full name', randomStringNumber, randomStringNumber, 'pw');
+  const newUser = {
+    firstname: 'dope',
+    lastname: 'mc',
+    username: 'dope username',
+    email: randomStringNumber,
+    password: randomStringNumber,
+    fieldOfActivity: 'computer science',
+    researchInterest: 'virtual reality',
+  };
+  const user = await createUser(newUser);
   res.send(`new user created with username ${user.username}`);
 });
 

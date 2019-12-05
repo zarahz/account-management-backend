@@ -5,10 +5,21 @@ const SALT_WORK_FACTOR = 10;
 
 // the user schema and how it is stored in the database
 const User = new Schema({
-  name: { type: String, required: true },
+  title: { type: String },
+  gender: { type: String },
+  firstname: { type: String, required: true },
+  lastname: { type: String, required: true },
   username: { type: String, unique: true, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  organisation: { type: String },
+  address: { type: String },
+  city: { type: String },
+  country: { type: String },
+  zipCode: { type: Number },
+  fieldOfActivity: { type: String, required: true },
+  researchInterest: { type: Array, required: true },
+  // payment and about can be added
 });
 
 // encrypt password before saving
