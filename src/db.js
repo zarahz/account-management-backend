@@ -6,7 +6,7 @@
 
 // using mongoose to simplify the db usage
 const mongoose = require('mongoose');
-require('./models');
+require('./model');
 
 // connect to the database
 mongoose.connect('mongodb://localhost/PWP_Mongodb', {
