@@ -7,7 +7,7 @@ const port = 10014;
 
 
 app.use(bodyParser.json());
-app.get('/', async (req, res) => res.send('Hello World!'));
+app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __dirname }); });
 
 // user API
 app.use(require('./routes/user'));
