@@ -9,6 +9,7 @@
     "dev": "nodemon src/server.js",
     "lint": "eslint --fix src"
   },
+  "homepage": "https://pwp.um.ifi.lmu.de/g14/",
   "author": "",
   "license": "ISC",
   "dependencies": {

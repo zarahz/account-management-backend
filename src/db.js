@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 require('./model');
 
 // connect to the database
-mongoose.connect('mongodb://localhost/PWP_Mongodb', {
+mongoose.connect('mongodb://accounts:accounts@127.0.0.1:27017/account-management', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
