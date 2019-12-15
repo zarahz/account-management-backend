@@ -18,8 +18,28 @@ const authenticateUser = async (username, password) => {
   return success ? user : null;
 };
 
-const deleteUser = () => {
-  // TODO: Implement
+const updatePassword = async (userID, newPassword) => {
+  const user = await User.findOne({ userID });
+  if (!user) { return null; }
+
+  const filter = { userID: userID };
+  const update = { password: newPassword };
+  const updated = await User.findOneAndUpdate(filter, update);
+  console.log(user.password);
+  if (!updated) { return -1; }
+
+  return 0;
+};
+
+const deleteUser = async (username) => {
+  const exists = await User.findOne({ username });
+  if (!exists) { return null; }
+
+  const deleted = await User.findOneAndDelete({ username });
+  if (!deleted) { return null; }
+
+  const success = exists.username.localeCompare(deleted.username);
+  return success;
 };
 
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
@@ -33,4 +53,5 @@ module.exports = {
   authenticateUser,
   getUser,
   getUserByID,
+  updatePassword,
 };
