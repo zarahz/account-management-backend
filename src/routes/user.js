@@ -1,8 +1,7 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID,
+  create, authenticate, get, getByID,
 } = require('../lib/user');
-const { securityQuestions, researchInterests } = require('../util/enums');
 
 const router = express.Router();
 
@@ -16,7 +15,7 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   const { redirectURL } = req.params;
   const { username, password } = req.body;
-  const user = await authenticateUser(username, password);
+  const user = await authenticate(username, password);
 
   if (!user) {
     return res.send('Unauthorized!');
@@ -33,20 +32,23 @@ router.post('/register', async (req, res) => {
   // user needs unique entries for database for email and username
   // used dummy number to ensure uniqueness
   try {
-    const user = await createUser(req.body);
-    return res.send(user);
+    const user = await create(req.body);
+    if (user && Object.keys(user).length !== 0) {
+      return res.send(user);
+    }
   } catch (error) {
     if (error.code === 11000) {
       return res.send({ error: 'duplicate-key', duplicate: error.keyValue });
     }
-    return res.send({ error: error.errmsg });
+    return res.send({ error: error.message });
   }
+  return res.send({ error: 'error' });
 });
 
 // check if username unique -> true means username is unique
 router.get('/uniqueUsername', async (req, res) => {
   const { username } = req.query;
-  const user = await getUser({ username });
+  const user = await get({ username });
   if (user) {
     return res.send(false);
   }
@@ -56,7 +58,7 @@ router.get('/uniqueUsername', async (req, res) => {
 // check if email unique -> true means email is unique
 router.get('/uniqueEmail', async (req, res) => {
   const { email } = req.query;
-  const user = await getUser({ email });
+  const user = await get({ email });
   if (user) {
     return res.send(false);
   }
@@ -65,7 +67,7 @@ router.get('/uniqueEmail', async (req, res) => {
 
 router.get('/checkSecurityAnswer', async (req, res) => {
   const { id, answer } = req.query;
-  const user = await getUserByID(id);
+  const user = await getByID(id);
   if (user) {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
     const userAnswer = answer.toLowerCase().trim();

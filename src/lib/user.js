@@ -4,14 +4,14 @@ const { compare } = require('../util/bcrypt');
 const { User } = require('../model');
 
 
-const createUser = async (userObj) => {
+const create = async (userObj) => {
   const newUser = new User(userObj);
   newUser.token = uuidv4();
   await newUser.save();
   return newUser;
 };
 
-const authenticateUser = async (username, password) => {
+const authenticate = async (username, password) => {
   const user = await User.findOne({ username });
   if (!user) { return null; }
   const success = await compare(password, user.password);
@@ -23,14 +23,14 @@ const deleteUser = () => {
 };
 
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
-const getUser = async (queryObject) => User.findOne(queryObject);
+const get = async (queryObject) => User.findOne(queryObject);
 
-const getUserByID = async (id) => User.findById(id);
+const getByID = async (id) => User.findById(id);
 
 module.exports = {
-  createUser,
+  create,
   deleteUser,
-  authenticateUser,
-  getUser,
-  getUserByID,
+  authenticate,
+  get,
+  getByID,
 };

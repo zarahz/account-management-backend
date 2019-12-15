@@ -4,25 +4,34 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "lint": "eslint --fix src"
+    "lint": "eslint --fix src",
+    "test": "jest --detectOpenHandles src/tests"
   },
   "homepage": "https://pwp.um.ifi.lmu.de/g14/",
   "author": "",
   "license": "ISC",
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
   "dependencies": {
     "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongoose": "^5.7.13",
     "nodemon": "^2.0.1",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "mongodb-memory-server": "^6.0.2"
   },
   "devDependencies": {
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2"
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
   }
 }
