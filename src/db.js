@@ -2,6 +2,9 @@
 // 1. start docker with mongo instance
 // docker run --name some-mongo -p 27017:27017 -v mongo:/data/db -d mongo
 
+// Open port to use local db GUI for server data -> open ssh port
+// ssh pwpg14@pwp.um.ifi.lmu.de -p 22022 -L 27017:localhost:27017
+
 // defining the mongoDB schema
 
 // using mongoose to simplify the db usage

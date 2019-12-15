@@ -14,6 +14,9 @@
 
 <body>
 	<h1>Welcome to the account management backend</h1>
+    <p>User Credentials:</p>
+    <p>username: username, password: password (-> role: user)</p>
+    <p>username: admin, password: admin (-> role: admin)</p>
     <p>The User Schema:</p>
     <pre class="schema">
         token: { type: String, required: true },
@@ -50,17 +53,17 @@
     <br/>
     <p>Collections</p>
     <ul>
-        <li>/securityQuestions - to get all possible security questions</li>
-        <li>/researchInterests - to get all possible research Interests</li>
+        <li>GET /securityQuestions - to get all possible security questions</li>
+        <li>GET /researchInterests - to get all possible research Interests</li>
     </ul>
     <hr>
     <p>User</p>
     <ul>
-        <li>/login - needs redirectUrl on where to go as parameter and username + password as body - on success the user is stored in the cookies and the redirectURL is used </li>
-        <li>/register - needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer)</li>
-        <li>/uniqueUsername - needs username as parameter and checks if db already contains that value</li>
-        <li>/uniqueEmail - needs email as parameter and checks if db already contains that value</li>
-        <li>/checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
+        <li>POST /login - needs redirectUrl on where to go as parameter and username + password as body - on success the user is stored in the cookies and the redirectURL is used </li>
+        <li>POST /register - needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer)</li>
+        <li>GET /uniqueUsername - needs username as parameter and checks if db already contains that value</li>
+        <li>GET /uniqueEmail - needs email as parameter and checks if db already contains that value</li>
+        <li>GET /checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
     </ul>
     <hr>
     <p>Will be implemented soon:</p>
