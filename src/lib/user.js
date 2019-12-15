@@ -18,8 +18,15 @@ const authenticateUser = async (username, password) => {
   return success ? user : null;
 };
 
-const deleteUser = () => {
-  // TODO: Implement
+const deleteUser = async (username) => {
+  const exists = await User.findOne({ username });
+  if (!exists) { return null; }
+
+  const deleted = await User.findOneAndDelete({ username });
+  if (!deleted) { return null; }
+
+  const success = exists.username.localeCompare(deleted.username);
+  return success;
 };
 
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'

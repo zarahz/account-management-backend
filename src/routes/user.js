@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser
 } = require('../lib/user');
 const { securityQuestions, researchInterests } = require('../util/enums');
 
@@ -80,6 +80,25 @@ router.get('/checkSecurityAnswer', async (req, res) => {
 // TODO
 router.patch('/updateUser');
 router.patch('/updatePassword'); // needs params: answer to security question and new pw
-router.delete('/deleteUser');
+router.post('/deleteUser', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await authenticateUser(username, password);
+
+  // check if user is authenticated
+  if (!user) {
+    return res.send('Unauthorized!');
+  }
+
+  // delete user in database
+  const deleted = await deleteUser(username);
+  if (deleted !== 0) {
+    return res.send('Failed!');
+  }
+
+  // delete user in cookies
+  res.clearCookie('user', JSON.stringify(user));
+
+  return res.redirect('/');
+});
 
 module.exports = router;
