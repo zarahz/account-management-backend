@@ -27,10 +27,35 @@ const getUser = async (queryObject) => User.findOne(queryObject);
 
 const getUserByID = async (id) => User.findById(id);
 
+const updateUser = async (userObj) => {
+  const user = await getUserByID(userObj.Id);
+  user.title = userObj.title;
+  user.gender = userObj.gender;
+  user.firstname = userObj.firstname;
+  user.lastname = userObj.lastname;
+  user.username = userObj.username;
+  user.email = userObj.email;
+  user.password = userObj.password;
+  user.organisation = userObj.organisation;
+  user.address = userObj.address;
+  user.city = userObj.city;
+  user.country = userObj.country;
+  user.zipCode = userObj.zipCode;
+  user.fieldOfActivity = userObj.fieldOfActivity;
+  user.researchInterest = userObj.researchInterest;
+  user.role = userObj.role;
+  user.securityQuestion = userObj.securityQuestion;
+  user.securityAnswer = userObj.securityAnswer;
+  user.eventbasedRole = userObj.eventbasedRole;
+  await user.save();
+  return user;
+};
+
 module.exports = {
   createUser,
   deleteUser,
   authenticateUser,
   getUser,
   getUserByID,
+  updateUser,
 };

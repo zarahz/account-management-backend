@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID,
+  createUser, authenticateUser, getUser, getUserByID, updateUser,
 } = require('../lib/user');
 const { securityQuestions, researchInterests } = require('../util/enums');
 
@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
   return res.send({ id: user.id, token: user.token });
 });
 
-router.post('/register', async (req, res) => {
+router.patch('/register', async (req, res) => {
   // user needs unique entries for database for email and username
   // used dummy number to ensure uniqueness
   try {
@@ -78,7 +78,18 @@ router.get('/checkSecurityAnswer', async (req, res) => {
 });
 
 // TODO
-router.patch('/updateUser');
+router.patch('/updateUser', async (req, res) => {
+  try {
+    const updatedUser = await updateUser(req.body);
+    return res.send(updatedUser);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.send({ error: 'duplicate-key', duplicate: error.keyValue });
+    }
+    return res.send({ error: error.errmsg });
+  }
+});
+// TODO
 router.patch('/updatePassword'); // needs params: answer to security question and new pw
 router.delete('/deleteUser');
 
