@@ -18,6 +18,19 @@ const authenticateUser = async (username, password) => {
   return success ? user : null;
 };
 
+const updatePassword = async (userID, newPassword) => {
+  const user = await User.findOne({ userID });
+  if (!user) { return null; }
+
+  const filter = { userID: userID };
+  const update = { password: newPassword };
+  const updated = await User.findOneAndUpdate(filter, update);
+  console.log(user.password);
+  if (!updated) { return -1; }
+
+  return 0;
+};
+
 const deleteUser = async (username) => {
   const exists = await User.findOne({ username });
   if (!exists) { return null; }
@@ -40,4 +53,5 @@ module.exports = {
   authenticateUser,
   getUser,
   getUserByID,
+  updatePassword,
 };

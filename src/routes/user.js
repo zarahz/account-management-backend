@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID, deleteUser
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updatePassword
 } = require('../lib/user');
 const { securityQuestions, researchInterests } = require('../util/enums');
 
@@ -79,7 +79,17 @@ router.get('/checkSecurityAnswer', async (req, res) => {
 
 // TODO
 router.patch('/updateUser');
-router.patch('/updatePassword'); // needs params: answer to security question and new pw
+router.patch('/updatePassword/:userID', async (req, res) => {
+  const { newPassword } = req.body;
+  const { userID } = req.param;
+  const update = await updatePassword(userID, newPassword);
+  if (update === -1) {
+    return res.status(400).send({ error: 'password update failed' });
+  }
+
+  return res.send(200);
+});
+
 router.post('/deleteUser', async (req, res) => {
   const { username, password } = req.body;
   const user = await authenticateUser(username, password);
@@ -92,7 +102,7 @@ router.post('/deleteUser', async (req, res) => {
   // delete user in database
   const deleted = await deleteUser(username);
   if (deleted !== 0) {
-    return res.send('Failed!');
+    return res.status(400).send({ error: 'Deletion failed' });
   }
 
   // delete user in cookies
