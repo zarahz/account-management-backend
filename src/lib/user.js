@@ -27,8 +27,8 @@ const getUser = async (queryObject) => User.findOne(queryObject);
 
 const getUserByID = async (id) => User.findById(id);
 
-const updateUser = async (userObj) => {
-  const user = await getUserByID(userObj.Id);
+const updateUser = async (userId, userObj) => {
+  const user = await getUserByID(userId);
   user.title = userObj.title;
   user.gender = userObj.gender;
   user.firstname = userObj.firstname;

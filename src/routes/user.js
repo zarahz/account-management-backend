@@ -77,10 +77,10 @@ router.get('/checkSecurityAnswer', async (req, res) => {
   return res.send({ error: 'user not found' });
 });
 
-// TODO
-router.patch('/updateUser', async (req, res) => {
+router.patch('/updateUser/:userID', async (req, res) => {
   try {
-    const updatedUser = await updateUser(req.body);
+    const { userID } = req.param;
+    const updatedUser = await updateUser(userID, req.body);
     return res.send(updatedUser);
   } catch (error) {
     if (error.code === 11000) {
