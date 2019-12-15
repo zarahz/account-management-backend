@@ -4,33 +4,60 @@ const { compare } = require('../util/bcrypt');
 const { User } = require('../model');
 
 
-const create = async (userObj) => {
+const createUser = async (userObj) => {
   const newUser = new User(userObj);
   newUser.token = uuidv4();
   await newUser.save();
   return newUser;
 };
 
-const authenticate = async (username, password) => {
+const authenticateUser = async (username, password) => {
   const user = await User.findOne({ username });
   if (!user) { return null; }
   const success = await compare(password, user.password);
   return success ? user : null;
 };
 
-const deleteUser = () => {
-  // TODO: Implement
+const updatePassword = async (userID, newPassword) => {
+  const user = await User.findOne({ userID });
+  if (!user) { return null; }
+
+  const filter = { userID };
+  const update = { password: newPassword };
+  const updated = await User.findOneAndUpdate(filter, update);
+  if (!updated) { return -1; }
+
+  return 0;
+};
+
+const deleteUser = async (username) => {
+  const exists = await User.findOne({ username });
+  if (!exists) { return null; }
+
+  const deleted = await User.findOneAndDelete({ username });
+  if (!deleted) { return null; }
+
+  const success = exists.username.localeCompare(deleted.username);
+  return success;
 };
 
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
-const get = async (queryObject) => User.findOne(queryObject);
+const getUser = async (queryObject) => User.findOne(queryObject);
 
-const getByID = async (id) => User.findById(id);
+const getUserByID = async (id) => User.findById(id);
+
+const updateUser = async (userId, userObj) => {
+  const user = await User.findOneAndUpdate(userId, userObj, { new: true });
+  console.log(user);
+  return user;
+};
 
 module.exports = {
-  create,
+  createUser,
   deleteUser,
-  authenticate,
-  get,
-  getByID,
+  authenticateUser,
+  getUser,
+  getUserByID,
+  updateUser,
+  updatePassword,
 };

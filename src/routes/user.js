@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  create, authenticate, get, getByID,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword,
 } = require('../lib/user');
 
 const router = express.Router();
@@ -15,7 +15,7 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   const { redirectURL } = req.params;
   const { username, password } = req.body;
-  const user = await authenticate(username, password);
+  const user = await authenticateUser(username, password);
 
   if (!user) {
     return res.send('Unauthorized!');
@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
   // user needs unique entries for database for email and username
   // used dummy number to ensure uniqueness
   try {
-    const user = await create(req.body);
+    const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
       return res.send(user);
     }
@@ -48,7 +48,7 @@ router.post('/register', async (req, res) => {
 // check if username unique -> true means username is unique
 router.get('/uniqueUsername', async (req, res) => {
   const { username } = req.query;
-  const user = await get({ username });
+  const user = await getUser({ username });
   if (user) {
     return res.send(false);
   }
@@ -58,7 +58,7 @@ router.get('/uniqueUsername', async (req, res) => {
 // check if email unique -> true means email is unique
 router.get('/uniqueEmail', async (req, res) => {
   const { email } = req.query;
-  const user = await get({ email });
+  const user = await getUser({ email });
   if (user) {
     return res.send(false);
   }
@@ -66,22 +66,63 @@ router.get('/uniqueEmail', async (req, res) => {
 });
 
 router.get('/checkSecurityAnswer', async (req, res) => {
-  const { id, answer } = req.query;
-  const user = await getByID(id);
+  const { id, securityAnswer } = req.body;
+  const user = await getUserByID(id);
   if (user) {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
-    const userAnswer = answer.toLowerCase().trim();
+    const userAnswer = securityAnswer.toLowerCase().trim();
     if (userAnswer === dbAnswer) {
-      return res.status(200);
+      return res.status(200).end();
     }
     return res.status(400).send({ error: 'wrong security answer' });
   }
   return res.send({ error: 'user not found' });
 });
 
-// TODO
-router.patch('/updateUser');
-router.patch('/updatePassword'); // needs params: answer to security question and new pw
-router.delete('/deleteUser');
+router.patch('/updateUser/:userID', async (req, res) => {
+  try {
+    const { userID } = req.params;
+    console.log(userID);
+    const updatedUser = await updateUser(userID, req.body);
+    return res.send(updatedUser);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.send({ error: 'duplicate-key', duplicate: error.keyValue });
+    }
+    return res.send({ error: error.errmsg });
+  }
+});
+
+router.patch('/updatePassword/:userID', async (req, res) => {
+  const { password } = req.body;
+  const { userID } = req.param;
+  const update = await updatePassword(userID, password);
+  if (update === -1) {
+    return res.status(400).send({ error: 'password update failed' });
+  }
+
+  return res.send(200);
+});
+
+router.post('/deleteUser', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await authenticateUser(username, password);
+
+  // check if user is authenticated
+  if (!user) {
+    return res.send('Unauthorized!');
+  }
+
+  // delete user in database
+  const deleted = await deleteUser(username);
+  if (deleted !== 0) {
+    return res.status(400).send({ error: 'Deletion failed' });
+  }
+
+  // delete user in cookies
+  res.clearCookie('user', JSON.stringify(user));
+
+  return res.redirect('/');
+});
 
 module.exports = router;

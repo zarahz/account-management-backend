@@ -79,14 +79,14 @@ const testUser = {
  */
 describe('user', () => {
   it('can be created correctly', async (done) => {
-    const user = await userLib.create(testUser);
+    const user = await userLib.createUser(testUser);
     expect(user.username).toBeTruthy();
     done();
   });
   it('can not be created - incomplete user', async (done) => {
     let message = false;
     try {
-      await userLib.create({ firstname: 'test', lastname: 'test' });
+      await userLib.createUser({ firstname: 'test', lastname: 'test' });
     } catch (e) {
       message = e.message;
     }
@@ -96,8 +96,8 @@ describe('user', () => {
   it('can not be created - duplicate values', async (done) => {
     let message = false;
     try {
-      await userLib.create(testUser);
-      await userLib.create(testUser);
+      await userLib.createUser(testUser);
+      await userLib.createUser(testUser);
     } catch (e) {
       message = e.message;
     }
@@ -105,11 +105,11 @@ describe('user', () => {
     done();
   });
   it('can authenticate correcly', async (done) => {
-    expect(async () => userLib.authenticate(testUser.username, testUser.password)).toBeTruthy();
+    expect(async () => userLib.authenticateUser(testUser.username, testUser.password)).toBeTruthy();
     done();
   });
   it('with wrong authentication data', async (done) => {
-    const user = await userLib.authenticate('notExtisting', 'FAILS');
+    const user = await userLib.authenticateUser('notExtisting', 'FAILS');
     expect(user).toEqual(null);
     done();
   });
@@ -118,7 +118,7 @@ describe('user', () => {
    * Test API points
 
   it('can login successfully', async (done) => {
-    const user = await userLib.create(testUser);
+    const user = await userLib.createUser(testUser);
     const res = await agent.post('/login')
       .send({
         username: user.username,

@@ -64,11 +64,11 @@
         <li>GET /uniqueUsername - needs username as parameter and checks if db already contains that value</li>
         <li>GET /uniqueEmail - needs email as parameter and checks if db already contains that value</li>
         <li>GET /checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
+        <li>PATCH /updateUser -needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer) and the userId as URL parameter</li>
     </ul>
     <hr>
     <p>Will be implemented soon:</p>
     <ul>
-        <li>/updateUser</li>
         <li>/updatePassword</li>
         <li>/deleteUser</li>
     </ul>
