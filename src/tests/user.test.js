@@ -4,7 +4,7 @@ const dbHandler = require('./dbHandler');
 const userLib = require('../lib/user');
 
 let server;
-let agent;
+// let agent;
 
 /**
  * Connect to a new in-memory database before running any tests.
