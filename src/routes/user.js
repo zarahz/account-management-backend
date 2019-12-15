@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID, updateUser,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword,
 } = require('../lib/user');
 const { securityQuestions, researchInterests } = require('../util/enums');
 
@@ -89,8 +89,37 @@ router.patch('/updateUser/:userID', async (req, res) => {
     return res.send({ error: error.errmsg });
   }
 });
-// TODO
-router.patch('/updatePassword'); // needs params: answer to security question and new pw
-router.delete('/deleteUser');
+
+router.patch('/updatePassword/:userID', async (req, res) => {
+  const { newPassword } = req.body;
+  const { userID } = req.param;
+  const update = await updatePassword(userID, newPassword);
+  if (update === -1) {
+    return res.status(400).send({ error: 'password update failed' });
+  }
+
+  return res.send(200);
+});
+
+router.post('/deleteUser', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await authenticateUser(username, password);
+
+  // check if user is authenticated
+  if (!user) {
+    return res.send('Unauthorized!');
+  }
+
+  // delete user in database
+  const deleted = await deleteUser(username);
+  if (deleted !== 0) {
+    return res.status(400).send({ error: 'Deletion failed' });
+  }
+
+  // delete user in cookies
+  res.clearCookie('user', JSON.stringify(user));
+
+  return res.redirect('/');
+});
 
 module.exports = router;
