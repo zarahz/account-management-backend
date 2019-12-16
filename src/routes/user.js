@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole,
 } = require('../lib/user');
 
 const router = express.Router();
@@ -79,10 +79,34 @@ router.get('/checkSecurityAnswer', async (req, res) => {
   return res.send({ error: 'user not found' });
 });
 
+// Get isowner userid eventid - returns status 200
+// to do
+router.get('/userRoleByID', async (req, res) => {
+  const { userID, eventID } = req.body;
+  const role = await checkRole(userID, eventID);
+  if (role === 0) { return res.send(200); }
+  return res.status(400).send({ error: 'no role found' });
+});
+
+router.get('/userByID', async (req, res) => {
+  const { userID } = req.body;
+  const user = await getUserInfoByID(userID);
+  if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
+  if (user === -2) { return res.status(400).send({ error: 'no user found' }); }
+  res.send(user);
+});
+
+router.get('/userInterestByID', async (req, res) => {
+  const { userID } = req.body;
+  const user = await getUserByID(userID);
+  if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
+  if (user === -2) { return res.status(400).send({ error: 'no user found' }); }
+  res.send(user.researchInterest);
+});
+
 router.patch('/updateUser/:userID', async (req, res) => {
   try {
     const { userID } = req.params;
-    console.log(userID);
     const updatedUser = await updateUser(userID, req.body);
     return res.send(updatedUser);
   } catch (error) {

@@ -21,6 +21,7 @@ const authenticateUser = async (username, password) => {
   return success ? user : null;
 };
 
+
 const updatePassword = async (userID, newPassword) => {
   const user = await User.findOne({ userID });
   if (!user) { return null; }
@@ -55,14 +56,44 @@ const deleteUser = async (username) => {
   return success;
 };
 
+const getUserInfoByID = async (userID) => {
+  if (userID.length < 24 || userID.length > 24) { return -1; }
+  const user = await User.findById(userID);
+  if (!user) { return -2; }
+
+  const userInfo = {
+    firstname: user.firstname,
+    lastname: user.lastname,
+    username: user.username,
+    email: user.email,
+    fieldOfActivity: user.fieldOfActivity,
+    researchInterest: user.researchInterest,
+  };
+  return userInfo;
+};
+
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
 const getUser = async (queryObject) => User.findOne(queryObject);
 
-const getUserByID = async (id) => User.findById(id);
+const getUserByID = async (id) => {
+  if (id.length < 24 || id.length > 24) { return -1; }
+  const user = await User.findById(id);
+  if (!user) { return -2; }
+
+  return user;
+};
+
+// to do
+const checkRole = async (userID, eventID) => {
+  if (userID.length < 24 || userID.length > 24) { return -1; }
+  const user = await User.findById(userID);
+  if (!user) { return -2; }
+
+  return user;
+};
 
 const updateUser = async (userId, userObj) => {
   const user = await User.findOneAndUpdate(userId, userObj, { new: true });
-  console.log(user);
   return user;
 };
 
@@ -74,4 +105,6 @@ module.exports = {
   getUserByID,
   updateUser,
   updatePassword,
+  getUserInfoByID,
+  checkRole,
 };
