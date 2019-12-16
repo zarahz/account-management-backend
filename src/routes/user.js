@@ -94,11 +94,17 @@ router.patch('/updateUser/:userID', async (req, res) => {
 });
 
 router.patch('/updatePassword/:userID', async (req, res) => {
-  const { password } = req.body;
+  const { newPassword } = req.body;
   const { userID } = req.param;
-  const update = await updatePassword(userID, password);
+  const update = await updatePassword(userID, newPassword);
   if (update === -1) {
+    return res.status(400).send({ error: 'no password entered' });
+  }
+  if (update === -2) {
     return res.status(400).send({ error: 'password update failed' });
+  }
+  if (update === -3) {
+    return res.status(400).send({ error: 'password encryption failed' });
   }
 
   return res.send(200);

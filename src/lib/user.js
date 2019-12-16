@@ -2,6 +2,9 @@ const uuidv4 = require('uuid/v4');
 
 const { compare } = require('../util/bcrypt');
 const { User } = require('../model');
+const { generateSalt, hash } = require('../util/bcrypt');
+
+const SALT_WORK_FACTOR = 10;
 
 
 const createUser = async (userObj) => {
@@ -21,13 +24,24 @@ const authenticateUser = async (username, password) => {
 const updatePassword = async (userID, newPassword) => {
   const user = await User.findOne({ userID });
   if (!user) { return null; }
+  if (!newPassword) { return -1; }
 
-  const filter = { userID };
-  const update = { password: newPassword };
-  const updated = await User.findOneAndUpdate(filter, update);
-  if (!updated) { return -1; }
+  try {
+    // generate a random salt number by passing a fix factor
+    const salt = await generateSalt(SALT_WORK_FACTOR);
+    // use this salt number to create a modified hash
+    const encrypted = await hash(newPassword, salt);
 
-  return 0;
+    // update password the user
+    const filter = { userID };
+    const update = { password: encrypted };
+    const updated = await User.findOneAndUpdate(filter, update);
+    if (!updated) { return -2; }
+
+    return 0;
+  } catch (error) {
+    return -3;
+  }
 };
 
 const deleteUser = async (username) => {
