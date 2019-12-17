@@ -18,14 +18,14 @@ router.post('/login', async (req, res) => {
   const user = await authenticateUser(username, password);
 
   if (!user) {
-    return res.send('Unauthorized!');
+    return res.status(401).send({ error: 'Unauthorized!' });
   }
 
   res.cookie('user', JSON.stringify(user));
   if (redirectURL) {
-    return res.redirect(redirectURL);
+    return res.status(200).redirect(redirectURL);
   }
-  return res.send({ id: user.id, token: user.token });
+  return res.status(200).send({ id: user.id, token: user.token });
 });
 
 router.post('/register', async (req, res) => {
@@ -34,15 +34,21 @@ router.post('/register', async (req, res) => {
   try {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
-      return res.send(user);
+      return res.status(200).send(user);
+    }
+    if (user === -1) {
+      return res.status(400).send({ error: 'username already exists' });
+    }
+    if (user === -2) {
+      return res.status(400).send({ error: 'this email is already used' });
     }
   } catch (error) {
     if (error.code === 11000) {
-      return res.send({ error: 'duplicate-key', duplicate: error.keyValue });
+      return res.status(400).send({ error: 'duplicate-key', duplicate: error.keyValue });
     }
-    return res.send({ error: error.message });
+    return res.status(500).send({ error: error.message });
   }
-  return res.send({ error: 'error' });
+  return res.status(500).send({ error: 'error' });
 });
 
 // check if username unique -> true means username is unique
@@ -50,9 +56,9 @@ router.get('/uniqueUsername', async (req, res) => {
   const { username } = req.query;
   const user = await getUser({ username });
   if (user) {
-    return res.send(false);
+    return res.status(200).send(false);
   }
-  return res.send(true);
+  return res.status(200).send(true);
 });
 
 // check if email unique -> true means email is unique
@@ -60,9 +66,9 @@ router.get('/uniqueEmail', async (req, res) => {
   const { email } = req.query;
   const user = await getUser({ email });
   if (user) {
-    return res.send(false);
+    return res.status(200).send(false);
   }
-  return res.send(true);
+  return res.status(200).send(true);
 });
 
 router.get('/checkSecurityAnswer', async (req, res) => {
@@ -76,62 +82,59 @@ router.get('/checkSecurityAnswer', async (req, res) => {
     }
     return res.status(400).send({ error: 'wrong security answer' });
   }
-  return res.send({ error: 'user not found' });
+  return res.status(403).send({ error: 'user not found' });
 });
 
-// Get isowner userid eventid - returns status 200
-// to do
 router.get('/userRoleByID', async (req, res) => {
-  const { userID, event } = req.body;
-  const role = await checkRole(userID, event);
-  console.log(role);
+  const { id, event } = req.body;
+  const role = await checkRole(id, event);
   if (role === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (role === -2) { return res.status(400).send({ error: 'no user found' }); }
-  if (role === -3) { return res.status(400).send({ error: 'no event found' }); }
+  if (role === -2) { return res.status(403).send({ error: 'no user found' }); }
+  if (role === -3) { return res.status(403).send({ error: 'no event found' }); }
   return res.status(200).send({ role });
 });
 
 router.get('/userByID', async (req, res) => {
-  const { userID } = req.body;
-  const user = await getUserInfoByID(userID);
+  const { id } = req.body;
+  const user = await getUserInfoByID(id);
   if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (user === -2) { return res.status(400).send({ error: 'no user found' }); }
-  res.send(user);
+  if (user === -2) { return res.status(403).send({ error: 'no user found' }); }
+  res.status(200).send(user);
 });
 
 router.get('/userInterestByID', async (req, res) => {
-  const { userID } = req.body;
-  const user = await getUserByID(userID);
+  const { id } = req.body;
+  const user = await getUserByID(id);
   if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (user === -2) { return res.status(400).send({ error: 'no user found' }); }
-  res.send(user.researchInterest);
+  if (user === -2) { return res.status(403).send({ error: 'no user found' }); }
+  res.status(200).send(user.researchInterest);
 });
 
-router.patch('/updateUser/:userID', async (req, res) => {
+router.patch('/updateUser/:id', async (req, res) => {
   try {
-    const { userID } = req.params;
-    const updatedUser = await updateUser(userID, req.body);
+    const { id } = req.params;
+    const updatedUser = await updateUser(id, req.body);
     return res.send(updatedUser);
   } catch (error) {
     if (error.code === 11000) {
-      return res.send({ error: 'duplicate-key', duplicate: error.keyValue });
+      return res.status(400).send({ error: 'duplicate-key', duplicate: error.keyValue });
     }
-    return res.send({ error: error.errmsg });
+    return res.status(500).send({ error: error.errmsg });
   }
 });
 
-router.patch('/updatePassword/:userID', async (req, res) => {
+router.patch('/updatePassword/:id', async (req, res) => {
   const { newPassword } = req.body;
-  const { userID } = req.param;
-  const update = await updatePassword(userID, newPassword);
+  const { id } = req.param;
+  const update = await updatePassword(id, newPassword);
   if (update === -1) {
     return res.status(400).send({ error: 'no password entered' });
   }
   if (update === -2) {
-    return res.status(400).send({ error: 'password update failed' });
+    return res.status(500).send({ error: 'password update failed' });
   }
   if (update === -3) {
-    return res.status(400).send({ error: 'password encryption failed' });
+    return res.status(500).send({ error: 'password encryption failed' });
   }
 
   return res.send(200);
@@ -143,19 +146,19 @@ router.post('/deleteUser', async (req, res) => {
 
   // check if user is authenticated
   if (!user) {
-    return res.send('Unauthorized!');
+    return res.status(401).send({ error: 'Unauthorized!' });
   }
 
   // delete user in database
   const deleted = await deleteUser(username);
   if (deleted !== 0) {
-    return res.status(400).send({ error: 'Deletion failed' });
+    return res.status(500).send({ error: 'Deletion failed' });
   }
 
   // delete user in cookies
   res.clearCookie('user', JSON.stringify(user));
 
-  return res.redirect('/');
+  return res.status(200).redirect('/');
 });
 
 module.exports = router;

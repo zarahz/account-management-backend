@@ -9,6 +9,22 @@ const SALT_WORK_FACTOR = 10;
 
 const createUser = async (userObj) => {
   const newUser = new User(userObj);
+  const username = newUser.username;
+  const email = newUser.email;
+  let exists = null;
+  let userN = null;
+  let userE = null;
+  userN = await User.findOne({ username });
+  console.log(userN);
+  userE = await User.findOne({ email });
+  console.log(userE);
+  if (userN !== null) {
+    exists = -1;
+  }
+  if (userE !== null) {
+    exists = -2;
+  }
+  if (exists !== null) { return exists; }
   newUser.token = uuidv4();
   await newUser.save();
   return newUser;
