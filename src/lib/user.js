@@ -88,8 +88,13 @@ const checkRole = async (userID, eventID) => {
   if (userID.length < 24 || userID.length > 24) { return -1; }
   const user = await User.findById(userID);
   if (!user) { return -2; }
-
-  return user;
+  let role = -3;
+  user.eventbasedRole.forEach((value) => {
+    if (value.event === Number(eventID)) {
+      role = value.role;
+    }
+  });
+  return role; // event not found
 };
 
 const updateUser = async (userId, userObj) => {

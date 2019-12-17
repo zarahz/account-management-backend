@@ -82,10 +82,13 @@ router.get('/checkSecurityAnswer', async (req, res) => {
 // Get isowner userid eventid - returns status 200
 // to do
 router.get('/userRoleByID', async (req, res) => {
-  const { userID, eventID } = req.body;
-  const role = await checkRole(userID, eventID);
-  if (role === 0) { return res.send(200); }
-  return res.status(400).send({ error: 'no role found' });
+  const { userID, event } = req.body;
+  const role = await checkRole(userID, event);
+  console.log(role);
+  if (role === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
+  if (role === -2) { return res.status(400).send({ error: 'no user found' }); }
+  if (role === -3) { return res.status(400).send({ error: 'no event found' }); }
+  return res.status(200).send({ role });
 });
 
 router.get('/userByID', async (req, res) => {
