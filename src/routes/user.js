@@ -112,6 +112,7 @@ router.patch('/updateUser/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updatedUser = await updateUser(id, req.body);
+    if (updatedUser === -1) { return res.status(403).send({ error: 'no user found' }); }
     return res.send(updatedUser);
   } catch (error) {
     if (error.code === 11000) {

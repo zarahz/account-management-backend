@@ -15,9 +15,7 @@ const createUser = async (userObj) => {
   let userN = null;
   let userE = null;
   userN = await User.findOne({ username });
-  console.log(userN);
   userE = await User.findOne({ email });
-  console.log(userE);
   if (userN !== null) {
     exists = -1;
   }
@@ -131,9 +129,22 @@ const checkRole = async (userID, eventID) => {
   return role; // event not found
 };
 
-const updateUser = async (userId, userObj) => {
-  const user = await User.findOneAndUpdate(userId, userObj, { new: true });
-  return user;
+const updateUser = async (id, userObj) => {
+  const filter = { '_id': id };
+  const userInfo = {
+    role: userObj.role,
+    firstname: userObj.firstname,
+    lastname: userObj.lastname,
+    username: userObj.username,
+    email: userObj.email,
+    fieldOfActivity: userObj.fieldOfActivity,
+    researchInterest: userObj.researchInterest,
+    eventbasedRole: userObj.eventbasedRole,
+  };
+  const userUpdated = await User.findOneAndUpdate(filter, userInfo, { new: true });
+  if (!userUpdated) { return -1; }
+
+  return userUpdated;
 };
 
 module.exports = {
@@ -146,5 +157,5 @@ module.exports = {
   updatePassword,
   getUserInfoByID,
   checkRole,
-  login
+  login,
 };
