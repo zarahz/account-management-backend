@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole, login,
 } = require('../lib/user');
 
 const router = express.Router();
@@ -15,12 +15,10 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   const { redirectURL } = req.params;
   const { username, password } = req.body;
-  const user = await authenticateUser(username, password);
+  const user = await login(username, password);
 
-  if (!user) {
-    return res.status(401).send({ error: 'Unauthorized!' });
-  }
-
+  if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
+  if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   res.cookie('user', JSON.stringify(user));
   if (redirectURL) {
     return res.status(200).redirect(redirectURL);
@@ -127,13 +125,14 @@ router.patch('/updatePassword/:id', async (req, res) => {
   const { newPassword } = req.body;
   const { id } = req.param;
   const update = await updatePassword(id, newPassword);
-  if (update === -1) {
+  if (update === -1) { return res.status(403).send({ error: 'no user found' }); }
+  if (update === -2) {
     return res.status(400).send({ error: 'no password entered' });
   }
-  if (update === -2) {
+  if (update === -3) {
     return res.status(500).send({ error: 'password update failed' });
   }
-  if (update === -3) {
+  if (update === -4) {
     return res.status(500).send({ error: 'password encryption failed' });
   }
 
@@ -145,9 +144,13 @@ router.post('/deleteUser', async (req, res) => {
   const user = await authenticateUser(username, password);
 
   // check if user is authenticated
-  if (!user) {
+  if (user === -1) {
+    return res.status(403).send({ error: 'no user found' });
+  }
+  if (user === -2) {
     return res.status(401).send({ error: 'Unauthorized!' });
   }
+
 
   // delete user in database
   const deleted = await deleteUser(username);

@@ -32,16 +32,35 @@ const createUser = async (userObj) => {
 
 const authenticateUser = async (username, password) => {
   const user = await User.findOne({ username });
-  if (!user) { return null; }
+  if (!user) { return -1; }
   const success = await compare(password, user.password);
-  return success ? user : null;
+  return success ? user : -2;
+};
+
+const login = async (username, password) => {
+  const user = await User.findOne({ username });
+  if (!user) { return -1; }
+  const success = await compare(password, user.password);
+
+  const userInfo = {
+    role: user.role,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    username: user.username,
+    email: user.email,
+    fieldOfActivity: user.fieldOfActivity,
+    researchInterest: user.researchInterest,
+    eventbasedRole: user.eventbasedRole,
+  };
+
+  return success ? userInfo : -2;
 };
 
 
 const updatePassword = async (userID, newPassword) => {
   const user = await User.findOne({ userID });
-  if (!user) { return null; }
-  if (!newPassword) { return -1; }
+  if (!user) { return -1; }
+  if (!newPassword) { return -2; }
 
   try {
     // generate a random salt number by passing a fix factor
@@ -53,11 +72,11 @@ const updatePassword = async (userID, newPassword) => {
     const filter = { userID };
     const update = { password: encrypted };
     const updated = await User.findOneAndUpdate(filter, update);
-    if (!updated) { return -2; }
+    if (!updated) { return -3; }
 
     return 0;
   } catch (error) {
-    return -3;
+    return -4;
   }
 };
 
@@ -99,7 +118,6 @@ const getUserByID = async (id) => {
   return user;
 };
 
-// to do
 const checkRole = async (userID, eventID) => {
   if (userID.length < 24 || userID.length > 24) { return -1; }
   const user = await User.findById(userID);
@@ -128,4 +146,5 @@ module.exports = {
   updatePassword,
   getUserInfoByID,
   checkRole,
+  login
 };
