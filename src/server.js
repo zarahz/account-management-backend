@@ -12,6 +12,7 @@ const port = 10014;
 }; */
 
 app.use(bodyParser.json());
+app.options('*', cors());
 app.use(cors());// app.use(cors(corsOptions));
 app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __dirname }); });
 
