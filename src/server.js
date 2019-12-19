@@ -10,14 +10,12 @@ const port = 10014;
   origin: 'https://pwp.um.ifi.lmu.de',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }; */
-
-app.use(bodyParser.json());
+// cors settings
 app.options('*', cors());
 app.use(cors());// app.use(cors(corsOptions));
-
 app.use((req, res, next) => {
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -32,6 +30,8 @@ app.use((req, res, next) => {
   // Pass to next layer of middleware
   next();
 });
+
+app.use(bodyParser.json());
 app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __dirname }); });
 
 // user API
