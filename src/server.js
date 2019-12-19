@@ -6,13 +6,13 @@ require('./db');
 const app = express();
 const port = 10014;
 
-const corsOptions = {
+/* const corsOptions = {
   origin: 'https://pwp.um.ifi.lmu.de',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
+}; */
 
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
+app.use(cors());// app.use(cors(corsOptions));
 app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __dirname }); });
 
 // user API
