@@ -41,11 +41,15 @@ const login = async (username, password) => {
   const success = await compare(password, user.password);
 
   const userInfo = {
+    token: user.token,
     role: user.role,
+    title: user.title,
+    gender: user.gender,
     firstname: user.firstname,
     lastname: user.lastname,
     username: user.username,
     email: user.email,
+    organisation: user.organisation,
     fieldOfActivity: user.fieldOfActivity,
     researchInterest: user.researchInterest,
     eventbasedRole: user.eventbasedRole,
@@ -133,10 +137,13 @@ const updateUser = async (id, userObj) => {
   const filter = { '_id': id };
   const userInfo = {
     role: userObj.role,
+    title: userObj.title,
+    gender: userObj.gender,
     firstname: userObj.firstname,
     lastname: userObj.lastname,
     username: userObj.username,
     email: userObj.email,
+    organisation: userObj.organisation,
     fieldOfActivity: userObj.fieldOfActivity,
     researchInterest: userObj.researchInterest,
     eventbasedRole: userObj.eventbasedRole,
