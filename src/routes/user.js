@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole, login,
+  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole,
 } = require('../lib/user');
 
 const router = express.Router();
@@ -13,15 +13,15 @@ const router = express.Router();
  * --> all services get user data!
  */
 router.post('/login', async (req, res) => {
-  const { redirectURL } = req.params;
+  const { redirectURL } = req.query;
   const { username, password } = req.body;
-  const user = await login(username, password);
+  const user = await authenticateUser(username, password);
 
-  if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
+  if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   res.cookie('user', JSON.stringify(user));
   if (redirectURL) {
-    return res.status(200).redirect(redirectURL);
+    return res.redirect(redirectURL);
   }
   return res.status(200).send({ id: user.id, token: user.token });
 });

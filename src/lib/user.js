@@ -9,8 +9,8 @@ const SALT_WORK_FACTOR = 10;
 
 const createUser = async (userObj) => {
   const newUser = new User(userObj);
-  const username = newUser.username;
-  const email = newUser.email;
+  const { username } = newUser;
+  const { email } = newUser;
   let exists = null;
   let userN = null;
   let userE = null;
@@ -32,28 +32,26 @@ const authenticateUser = async (username, password) => {
   const user = await User.findOne({ username });
   if (!user) { return -1; }
   const success = await compare(password, user.password);
-  return success ? user : -2;
-};
-
-const login = async (username, password) => {
-  const user = await User.findOne({ username });
-  if (!user) { return -1; }
-  const success = await compare(password, user.password);
-
-  const userInfo = {
+  const reducedUser = {
+    id: user.id,
+    token: user.token,
+    gender: user.gender,
     role: user.role,
     firstname: user.firstname,
     lastname: user.lastname,
     username: user.username,
     email: user.email,
+    organisation: user.organisation,
+    address: user.address,
+    city: user.city,
+    country: user.country,
+    zipCode: user.zipCode,
     fieldOfActivity: user.fieldOfActivity,
     researchInterest: user.researchInterest,
     eventbasedRole: user.eventbasedRole,
   };
-
-  return success ? userInfo : -2;
+  return success ? reducedUser : -2;
 };
-
 
 const updatePassword = async (userID, newPassword) => {
   const user = await User.findOne({ userID });
@@ -130,7 +128,7 @@ const checkRole = async (userID, eventID) => {
 };
 
 const updateUser = async (id, userObj) => {
-  const filter = { '_id': id };
+  const filter = { _id: id };
   const userInfo = {
     role: userObj.role,
     firstname: userObj.firstname,
