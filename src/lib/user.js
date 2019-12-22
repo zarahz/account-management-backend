@@ -6,6 +6,24 @@ const { generateSalt, hash } = require('../util/bcrypt');
 
 const SALT_WORK_FACTOR = 10;
 
+const reduceUser = (user) => ({
+  id: user.id,
+  token: user.token,
+  gender: user.gender,
+  role: user.role,
+  firstname: user.firstname,
+  lastname: user.lastname,
+  username: user.username,
+  email: user.email,
+  organisation: user.organisation,
+  address: user.address,
+  city: user.city,
+  country: user.country,
+  zipCode: user.zipCode,
+  fieldOfActivity: user.fieldOfActivity,
+  researchInterest: user.researchInterest,
+  eventbasedRole: user.eventbasedRole,
+});
 
 const createUser = async (userObj) => {
   const newUser = new User(userObj);
@@ -25,32 +43,14 @@ const createUser = async (userObj) => {
   if (exists !== null) { return exists; }
   newUser.token = uuidv4();
   await newUser.save();
-  return newUser;
+  return reduceUser(newUser);
 };
 
 const authenticateUser = async (username, password) => {
   const user = await User.findOne({ username });
   if (!user) { return -1; }
   const success = await compare(password, user.password);
-  const reducedUser = {
-    id: user.id,
-    token: user.token,
-    gender: user.gender,
-    role: user.role,
-    firstname: user.firstname,
-    lastname: user.lastname,
-    username: user.username,
-    email: user.email,
-    organisation: user.organisation,
-    address: user.address,
-    city: user.city,
-    country: user.country,
-    zipCode: user.zipCode,
-    fieldOfActivity: user.fieldOfActivity,
-    researchInterest: user.researchInterest,
-    eventbasedRole: user.eventbasedRole,
-  };
-  return success ? reducedUser : -2;
+  return success ? reduceUser(user) : -2;
 };
 
 const updatePassword = async (userID, newPassword) => {
@@ -155,5 +155,4 @@ module.exports = {
   updatePassword,
   getUserInfoByID,
   checkRole,
-  login,
 };

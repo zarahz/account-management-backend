@@ -13,17 +13,13 @@ const router = express.Router();
  * --> all services get user data!
  */
 router.post('/login', async (req, res) => {
-  const { redirectURL } = req.query;
   const { username, password } = req.body;
   const user = await authenticateUser(username, password);
 
   if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   res.cookie('user', JSON.stringify(user));
-  if (redirectURL) {
-    return res.redirect(redirectURL);
-  }
-  return res.status(200).send({ id: user.id, token: user.token });
+  return res.status(200).send(user);
 });
 
 router.post('/register', async (req, res) => {
