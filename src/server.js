@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const morgan = require('morgan');
 require('./db');
 
 const app = express();
@@ -11,11 +12,14 @@ const port = 10014;
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }; */
 // cors settings
+app.use(morgan('combined'));
 app.use(cors({
   origin: '*',
 }));
 
 app.use(bodyParser.json());
+
+app.options('*', cors());
 app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __dirname }); });
 
 // user API
