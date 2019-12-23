@@ -161,4 +161,14 @@ router.post('/deleteUser', async (req, res) => {
   return res.status(200).redirect('/');
 });
 
+router.get('/getSecurityQuestion', async (req, res) => {
+  const { email } = req.body;
+  const user = await getUser({ email });
+  if (user) {
+    const userData = { id: user.id, securityQuestion: user.securityQuestion };
+    res.status(200).send({ userData });
+  }
+  return res.status(403).send({ error: 'user not found' });
+});
+
 module.exports = router;
