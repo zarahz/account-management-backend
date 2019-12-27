@@ -68,7 +68,7 @@ router.get('/uniqueEmail', async (req, res) => {
 router.get('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
   const user = await getUserByID(id);
-  if (user) {
+  if (user !== -1 && user !== -2) {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
     const userAnswer = securityAnswer.toLowerCase().trim();
     if (userAnswer === dbAnswer) {
