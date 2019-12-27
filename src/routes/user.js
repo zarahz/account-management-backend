@@ -120,7 +120,7 @@ router.patch('/updateUser/:id', async (req, res) => {
 
 router.patch('/updatePassword/:id', async (req, res) => {
   const { newPassword } = req.body;
-  const { id } = req.param;
+  const { id } = req.params;
   const update = await updatePassword(id, newPassword);
   if (update === -1) { return res.status(403).send({ error: 'no user found' }); }
   if (update === -2) {
