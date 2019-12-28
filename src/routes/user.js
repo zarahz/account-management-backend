@@ -166,7 +166,7 @@ router.get('/getSecurityQuestion', async (req, res) => {
   const user = await getUser({ email });
   if (user) {
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
-    res.status(200).send({ userData });
+    return res.status(200).send({ userData });
   }
   return res.status(403).send({ error: 'user not found' });
 });
