@@ -53,8 +53,8 @@ const authenticateUser = async (username, password) => {
   return success ? reduceUser(user) : -2;
 };
 
-const updatePassword = async (userID, newPassword) => {
-  const user = await User.findOne({ userID });
+const updatePassword = async (_id, newPassword) => {
+  const user = await User.findOne({ _id });
   if (!user) { return -1; }
   if (!newPassword) { return -2; }
 
@@ -65,7 +65,7 @@ const updatePassword = async (userID, newPassword) => {
     const encrypted = await hash(newPassword, salt);
 
     // update password the user
-    const filter = { userID };
+    const filter = { _id };
     const update = { password: encrypted };
     const updated = await User.findOneAndUpdate(filter, update);
     if (!updated) { return -3; }
@@ -87,9 +87,9 @@ const deleteUser = async (username) => {
   return success;
 };
 
-const getUserInfoByID = async (userID) => {
-  if (userID.length < 24 || userID.length > 24) { return -1; }
-  const user = await User.findById(userID);
+const getUserInfoByID = async (_id) => {
+  if (_id.length < 24 || _id.length > 24) { return -1; }
+  const user = await User.findById(_id);
   if (!user) { return -2; }
 
   const userInfo = {
@@ -106,17 +106,17 @@ const getUserInfoByID = async (userID) => {
 // queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
 const getUser = async (queryObject) => User.findOne(queryObject);
 
-const getUserByID = async (id) => {
-  if (id.length < 24 || id.length > 24) { return -1; }
-  const user = await User.findById(id);
+const getUserByID = async (_id) => {
+  if (_id.length < 24 || _id.length > 24) { return -1; }
+  const user = await User.findById(_id);
   if (!user) { return -2; }
 
   return user;
 };
 
-const checkRole = async (userID, eventID) => {
-  if (userID.length < 24 || userID.length > 24) { return -1; }
-  const user = await User.findById(userID);
+const checkRole = async (_id, eventID) => {
+  if (_id.length < 24 || _id.length > 24) { return -1; }
+  const user = await User.findById(_id);
   if (!user) { return -2; }
   let role = -3;
   user.eventbasedRole.forEach((value) => {

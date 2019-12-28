@@ -65,7 +65,7 @@ router.get('/uniqueEmail', async (req, res) => {
   return res.status(200).send(true);
 });
 
-router.get('/checkSecurityAnswer', async (req, res) => {
+router.post('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
   const user = await getUserByID(id);
   if (user !== -1 && user !== -2) {
@@ -161,7 +161,7 @@ router.post('/deleteUser', async (req, res) => {
   return res.status(200).redirect('/');
 });
 
-router.get('/getSecurityQuestion', async (req, res) => {
+router.post('/getSecurityQuestion', async (req, res) => {
   const { email } = req.body;
   const user = await getUser({ email });
   if (user) {

@@ -63,7 +63,7 @@
         <li>POST /register - needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer)</li>
         <li>GET /uniqueUsername - needs username as parameter and checks if db already contains that value</li>
         <li>GET /uniqueEmail - needs email as parameter and checks if db already contains that value</li>
-        <li>GET /checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
+        <li>POST /checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
         <li>PATCH /updateUser -needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer) and the userId as URL parameter</li>
         <li>PATCH /updatePassword - needs new password as body and userID as parameter</li>
         <li>POST /deleteUser - needs username and password as body </li>
