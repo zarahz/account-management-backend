@@ -25,6 +25,9 @@ app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __
 // user API
 app.use(require('./routes/user'));
 
+// decode user token API
+app.use(require('./routes/decoder'));
+
 // collections API
 app.use(require('./routes/collection'));
 

@@ -19,28 +19,27 @@
     <p>username: admin, password: admin (-> role: admin)</p>
     <p>The User Schema:</p>
     <pre class="schema">
-        token: { type: String, required: true },
         title: { type: String }, // maybe predefined and select via dropdown
         gender: { type: String }, // select via dropdown?
-        firstname: { type: String, required: true, trim: true },
-        lastname: { type: String, required: true, trim: true },
-        username: { // needs to be trimmed in frontend?
+        <b>firstname</b>: { type: String, required: true, trim: true },
+        <b>lastname</b>: { type: String, required: true, trim: true },
+        <b>username</b>: { // needs to be trimmed in frontend?
             type: String, unique: true, required: true, trim: true,
         },
-        email: {
+        <b>email</b> {
             type: String, unique: true, required: true, trim: true,
         },
-        password: { type: String, required: true },
+        <b>password</b> { type: String, required: true },
         organisation: { type: String, trim: true },
         address: { type: String, trim: true },
         city: { type: String }, // maybe also predefined via npm module
         country: { type: String }, // maybe also predefined via npm module
         zipCode: { type: Number },
-        fieldOfActivity: { type: String, required: true, trim: true },
-        researchInterest: { type: Array, required: true }, // predefined in enums
+        <b>fieldOfActivity</b>: { type: String, required: true, trim: true },
+        <b>researchInterest</b>: { type: Array, required: true }, // predefined in enums
         role: { type: String, enum: ['admin', 'user'], default: 'user' },
-        securityQuestion: { type: String, required: true }, // predefined in enums
-        securityAnswer: { type: String, required: true, trim: true },
+        <b>securityQuestion</b>: { type: String, required: true }, // predefined in enums
+        <b>securityAnswer</b>: { type: String, required: true, trim: true },
         eventbasedRole: [
             {
             role: { type: String },
@@ -53,21 +52,105 @@
     <br/>
     <p>Collections</p>
     <ul>
-        <li>POST /securityQuestions - (languageCode "de" or "en" as body parameter) to get all possible security questions</li>
-        <li>GET /researchInterests - to get all possible research Interests</li>
+        <li>POST /securityQuestions
+            <ul>
+                <li>query: languageCode (en or de)</li>
+                <li>returns: all possible security questions</li>
+            </ul>
+        </li><br>
+        <li>GET /researchInterests
+            <ul>
+                <li>returns: all possible research Interests</li>
+            </ul>
+        </li>
     </ul>
     <hr>
     <p>User</p>
     <ul>
-        <li>POST /login - needs redirectUrl on where to go as parameter and username + password as body - on success the user is stored in the cookies and the redirectURL is used </li>
-        <li>POST /register - needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer)</li>
-        <li>GET /uniqueUsername - needs username as parameter and checks if db already contains that value</li>
-        <li>GET /uniqueEmail - needs email as parameter and checks if db already contains that value</li>
-        <li>POST /checkSecurityAnswer - needs user id and his input answer and check if the saved answer matches</li>
-        <li>PATCH /updateUser -needs a userobject as body (minumum requirements: firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer) and the userId as URL parameter</li>
-        <li>PATCH /updatePassword - needs new password as body and userID as parameter</li>
-        <li>POST /deleteUser - needs username and password as body </li>
+        <h3><b>GET</b></h3>
+        <li>GET /userByID 
+            <ul>
+                <li>query: id </li>
+                <li>returns: 403 on error with message or jwt token on success</li>
+            </ul>
+        </li><br>
+        <li>GET /userRoleByID (based on event)
+            <ul>
+                <li>query: id, event (event here only means the event id) </li>
+                <li>returns: 403 on error with message or the event role</li>
+            </ul>
+        </li><br>
+        <li>GET /researchInterestByID 
+            <ul>
+                <li>query: id</li>
+                <li>returns: 403 on error with message or researchInterests on success</li>
+            </ul>
+        </li><br>
+        <li>GET /securityQuestion 
+            <ul>
+                <li>query: username</li>
+                <li>returns: 403 on error with message or user id and querstion on success</li>
+            </ul>
+        </li><br>
+        <li>GET /uniqueUsername
+            <ul>
+                <li>query: username</li>
+                <li>returns: boolean wether username is unique</li>
+            </ul>
+        </li><br>
+        <li>GET /uniqueEmail 
+            <ul>
+                <li>query: email</li>
+                <li>returns: boolean wether email is unique</li>
+            </ul>
+        </li><br>
+        <h3><b>POST/PATCH</b></h3>
+        <li>POST /login
+            <ul>
+                <li>body: username, password</li>
+                <li>returns: 400/401 on error with message or jwt token on success</li>
+            </ul>
+        </li><br>
+        <li>POST /register
+            <ul>
+                <li>body: user object (see hint below for minimal requirements)</li>
+                <li>returns: 400/500 on error with message or jwt token on success</li>
+            </ul>
+        </li><br>
+        <li>POST /checkSecurityAnswer 
+            <ul>
+                <li>body: id, securityAnswer</li>
+                <li>returns: 400/403 on error with message or 200 on success</li>
+            </ul>
+        </li><br>
+        <li>POST /deleteUser 
+            <ul>
+                <li>body: username, password</li>
+                <li>returns: 401/403/500 on error with message or 200 on success</li>
+            </ul>
+        </li><br>
+        <li>PATCH /updateUser 
+            <ul>
+                <li>body: object containing new values</li>
+                <li>params: id </li>
+                <li>returns: 400/403/500 on error with message or jwt token on success</li>
+            </ul>
+        </li><br>
+        <li>PATCH /updatePassword 
+            <ul>
+                <li>body: newPassword</li>
+                <li>params: id</li>
+                <li>returns: 400/403/500 on error with message or 200 on success</li>
+            </ul>
+        </li><br>
     </ul>
+    <b>HINT: </b> 
+    <span>minimal user object needs to contain firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer</span>
     <hr>
+    <p>May be implemented soon</p>
+    <ul>
+        <li> add event object to existing user (event id and user role for that event) </li>
+        <li> [only if needed] get all users and their roles by event id</li>
+    </ul>
 </body>
 </html>

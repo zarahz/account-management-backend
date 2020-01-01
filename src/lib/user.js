@@ -1,5 +1,3 @@
-const uuidv4 = require('uuid/v4');
-
 const { compare } = require('../util/bcrypt');
 const { User } = require('../model');
 const { generateSalt, hash } = require('../util/bcrypt');
@@ -8,7 +6,6 @@ const SALT_WORK_FACTOR = 10;
 
 const reduceUser = (user) => ({
   id: user.id,
-  token: user.token,
   gender: user.gender,
   role: user.role,
   firstname: user.firstname,
@@ -41,7 +38,6 @@ const createUser = async (userObj) => {
     exists = -2;
   }
   if (exists !== null) { return exists; }
-  newUser.token = uuidv4();
   await newUser.save();
   return reduceUser(newUser);
 };
@@ -54,9 +50,9 @@ const authenticateUser = async (username, password) => {
 };
 
 const updatePassword = async (_id, newPassword) => {
+  if (!newPassword) { return 'empty_password'; }
   const user = await User.findOne({ _id });
-  if (!user) { return -1; }
-  if (!newPassword) { return -2; }
+  if (!user) { return 'no_user_found'; }
 
   try {
     // generate a random salt number by passing a fix factor
@@ -64,15 +60,14 @@ const updatePassword = async (_id, newPassword) => {
     // use this salt number to create a modified hash
     const encrypted = await hash(newPassword, salt);
 
-    // update password the user
-    const filter = { _id };
+    // update password of the user
     const update = { password: encrypted };
-    const updated = await User.findOneAndUpdate(filter, update);
-    if (!updated) { return -3; }
+    const updated = await User.findOneAndUpdate({ _id }, update);
+    if (!updated) { return 'update_failed'; }
 
-    return 0;
+    return 'success';
   } catch (error) {
-    return -4;
+    return 'encryption_failed';
   }
 };
 
@@ -87,38 +82,16 @@ const deleteUser = async (username) => {
   return success;
 };
 
-const getUserInfoByID = async (_id) => {
-  if (_id.length < 24 || _id.length > 24) { return -1; }
-  const user = await User.findById(_id);
-  if (!user) { return -2; }
-
-  const userInfo = {
-    firstname: user.firstname,
-    lastname: user.lastname,
-    username: user.username,
-    email: user.email,
-    fieldOfActivity: user.fieldOfActivity,
-    researchInterest: user.researchInterest,
-  };
-  return userInfo;
-};
-
-// queryobject contains an attribute and its value i.e. username: 'aCoOolUser'
-const getUser = async (queryObject) => User.findOne(queryObject);
-
-const getUserByID = async (_id) => {
-  if (_id.length < 24 || _id.length > 24) { return -1; }
-  const user = await User.findById(_id);
-  if (!user) { return -2; }
-
-  return user;
+const getUser = async (queryObject, fullUserObject = false) => {
+  const user = await User.findOne(queryObject);
+  if (!user) { return -1; }
+  return (fullUserObject) ? user : reduceUser(user);
 };
 
 const checkRole = async (_id, eventID) => {
-  if (_id.length < 24 || _id.length > 24) { return -1; }
   const user = await User.findById(_id);
-  if (!user) { return -2; }
-  let role = -3;
+  if (!user) { return -1; }
+  let role = -2;
   user.eventbasedRole.forEach((value) => {
     if (value.event === Number(eventID)) {
       role = value.role;
@@ -129,20 +102,9 @@ const checkRole = async (_id, eventID) => {
 
 const updateUser = async (id, userObj) => {
   const filter = { _id: id };
-  const userInfo = {
-    role: userObj.role,
-    firstname: userObj.firstname,
-    lastname: userObj.lastname,
-    username: userObj.username,
-    email: userObj.email,
-    fieldOfActivity: userObj.fieldOfActivity,
-    researchInterest: userObj.researchInterest,
-    eventbasedRole: userObj.eventbasedRole,
-  };
-  const userUpdated = await User.findOneAndUpdate(filter, userInfo, { new: true });
+  const userUpdated = await User.findOneAndUpdate(filter, userObj, { new: true });
   if (!userUpdated) { return -1; }
-
-  return userUpdated;
+  return reduceUser(userUpdated);
 };
 
 module.exports = {
@@ -150,9 +112,7 @@ module.exports = {
   deleteUser,
   authenticateUser,
   getUser,
-  getUserByID,
   updateUser,
   updatePassword,
-  getUserInfoByID,
   checkRole,
 };

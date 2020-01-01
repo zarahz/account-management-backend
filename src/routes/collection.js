@@ -3,8 +3,8 @@ const { securityQuestionsEN, securityQuestionsDE, researchInterests } = require(
 
 const router = express.Router();
 
-router.post('/securityQuestions', async (req, res) => {
-  const { languageCode } = req.body;
+router.get('/securityQuestions', async (req, res) => {
+  const { languageCode } = req.query;
   if (languageCode === 'de') {
     res.status(200).send(securityQuestionsDE);
   } else if (languageCode === 'en') {

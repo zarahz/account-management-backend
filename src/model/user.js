@@ -5,7 +5,6 @@ const SALT_WORK_FACTOR = 10;
 
 // the user schema and how it is stored in the database
 const User = new Schema({
-  token: { type: String, required: true },
   title: { type: String }, // maybe predefined and select via dropdown
   gender: { type: String }, // select via dropdown?
   firstname: { type: String, required: true, trim: true },

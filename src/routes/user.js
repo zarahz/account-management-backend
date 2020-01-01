@@ -1,6 +1,9 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const config = require('../../config');
 const {
-  createUser, authenticateUser, getUser, getUserByID, deleteUser, updateUser, updatePassword, getUserInfoByID, checkRole,
+  createUser, authenticateUser, getUser, deleteUser, updateUser,
+  updatePassword, checkRole,
 } = require('../lib/user');
 
 const router = express.Router();
@@ -18,8 +21,9 @@ router.post('/login', async (req, res) => {
 
   if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
-  res.cookie('user', JSON.stringify(user));
-  return res.status(200).send(user);
+  const token = jwt.sign(user, config.secret);
+  res.cookie('user', JSON.stringify(token));
+  return res.status(200).send(token);
 });
 
 router.post('/register', async (req, res) => {
@@ -28,7 +32,8 @@ router.post('/register', async (req, res) => {
   try {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
-      return res.status(200).send(user);
+      const token = jwt.sign(user, config.secret);
+      return res.status(200).send(token);
     }
     if (user === -1) {
       return res.status(400).send({ error: 'username already exists' });
@@ -67,8 +72,8 @@ router.get('/uniqueEmail', async (req, res) => {
 
 router.post('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
-  const user = await getUserByID(id);
-  if (user !== -1 && user !== -2) {
+  const user = await getUser({ _id: id }, true); // true to get the user object with sensitive data
+  if (user !== -1) {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
     const userAnswer = securityAnswer.toLowerCase().trim();
     if (userAnswer === dbAnswer) {
@@ -80,28 +85,26 @@ router.post('/checkSecurityAnswer', async (req, res) => {
 });
 
 router.get('/userRoleByID', async (req, res) => {
-  const { id, event } = req.body;
+  const { id, event } = req.query;
   const role = await checkRole(id, event);
-  if (role === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (role === -2) { return res.status(403).send({ error: 'no user found' }); }
-  if (role === -3) { return res.status(403).send({ error: 'no event found' }); }
+  if (role === -1) { return res.status(403).send({ error: 'no user found' }); }
+  if (role === -2) { return res.status(403).send({ error: 'no event found' }); }
   return res.status(200).send({ role });
 });
 
 router.get('/userByID', async (req, res) => {
-  const { id } = req.body;
-  const user = await getUserInfoByID(id);
-  if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (user === -2) { return res.status(403).send({ error: 'no user found' }); }
-  res.status(200).send(user);
+  const id = { _id: req.query.id };
+  const user = await getUser(id);
+  if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
+  const token = jwt.sign(user, config.secret);
+  return res.status(200).send(token);
 });
 
-router.get('/userInterestByID', async (req, res) => {
-  const { id } = req.body;
-  const user = await getUserByID(id);
-  if (user === -1) { return res.status(400).send({ error: 'entered id has wrong length' }); }
-  if (user === -2) { return res.status(403).send({ error: 'no user found' }); }
-  res.status(200).send(user.researchInterest);
+router.get('/researchInterestByID', async (req, res) => {
+  const id = { _id: req.query.id };
+  const user = await getUser({ id });
+  if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
+  return res.status(200).send(user.researchInterest);
 });
 
 router.patch('/updateUser/:id', async (req, res) => {
@@ -109,7 +112,8 @@ router.patch('/updateUser/:id', async (req, res) => {
     const { id } = req.params;
     const updatedUser = await updateUser(id, req.body);
     if (updatedUser === -1) { return res.status(403).send({ error: 'no user found' }); }
-    return res.send(updatedUser);
+    const token = jwt.sign(JSON.stringify(updatedUser), config.secret);
+    return res.status(200).send(token);
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).send({ error: 'duplicate-key', duplicate: error.keyValue });
@@ -121,19 +125,20 @@ router.patch('/updateUser/:id', async (req, res) => {
 router.patch('/updatePassword/:id', async (req, res) => {
   const { newPassword } = req.body;
   const { id } = req.params;
-  const update = await updatePassword(id, newPassword);
-  if (update === -1) { return res.status(403).send({ error: 'no user found' }); }
-  if (update === -2) {
-    return res.status(400).send({ error: 'no password entered' });
-  }
-  if (update === -3) {
-    return res.status(500).send({ error: 'password update failed' });
-  }
-  if (update === -4) {
-    return res.status(500).send({ error: 'password encryption failed' });
-  }
+  const updateResult = await updatePassword(id, newPassword);
 
-  return res.send(200);
+  switch (updateResult) {
+    case 'success':
+      return res.send(200).end();
+    case 'empty_password':
+      return res.status(400).send({ error: 'no password entered' });
+    case 'no_user_found':
+      return res.status(403).send({ error: 'no user found' });
+    case 'encryption_failed':
+      return res.status(500).send({ error: 'password encryption failed' });
+    default:
+      return res.status(500).send({ error: 'password update failed' });
+  }
 });
 
 router.post('/deleteUser', async (req, res) => {
@@ -161,9 +166,9 @@ router.post('/deleteUser', async (req, res) => {
   return res.status(200).redirect('/');
 });
 
-router.post('/getSecurityQuestion', async (req, res) => {
-  const { email } = req.body;
-  const user = await getUser({ email });
+router.get('/securityQuestion', async (req, res) => {
+  const { username } = req.query;
+  const user = await getUser({ username }, true);
   if (user) {
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
     return res.status(200).send({ userData });
