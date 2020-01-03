@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   const token = jwt.sign(user, config.secret);
   res.cookie('user', JSON.stringify(token));
-  return res.status(200).send(token);
+  return res.status(200).send({ token });
 });
 
 router.post('/register', async (req, res) => {
