@@ -165,8 +165,8 @@ router.post('/deleteUser', async (req, res) => {
   return res.status(200).redirect('/');
 });
 
-router.get('/securityQuestion', async (req, res) => {
-  const { email } = req.query;
+router.post('/securityQuestion', async (req, res) => {
+  const { email } = req.body;
   const user = await getUser({ email }, true);
   if (user) {
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
