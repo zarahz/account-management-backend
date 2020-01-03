@@ -2,8 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const {
-  createUser, authenticateUser, getUser, deleteUser, updateUser,
-  updatePassword, checkRole,
+  createUser, authenticateUser, getUser, deleteUser, updateUser, updatePassword, checkRole,
 } = require('../lib/user');
 
 const router = express.Router();
