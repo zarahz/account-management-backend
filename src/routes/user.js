@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
       const token = jwt.sign(user, config.secret);
-      return res.status(200).send(token);
+      return res.status(200).send({ token });
     }
     if (user === -1) {
       return res.status(400).send({ error: 'username already exists' });
@@ -96,7 +96,7 @@ router.get('/userByID', async (req, res) => {
   const user = await getUser(id);
   if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
   const token = jwt.sign(user, config.secret);
-  return res.status(200).send(token);
+  return res.status(200).send({ token });
 });
 
 router.get('/researchInterestByID', async (req, res) => {
@@ -112,7 +112,7 @@ router.patch('/updateUser/:id', async (req, res) => {
     const updatedUser = await updateUser(id, req.body);
     if (updatedUser === -1) { return res.status(403).send({ error: 'no user found' }); }
     const token = jwt.sign(JSON.stringify(updatedUser), config.secret);
-    return res.status(200).send(token);
+    return res.status(200).send({ token });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).send({ error: 'duplicate-key', duplicate: error.keyValue });
@@ -166,8 +166,8 @@ router.post('/deleteUser', async (req, res) => {
 });
 
 router.get('/securityQuestion', async (req, res) => {
-  const { username } = req.query;
-  const user = await getUser({ username }, true);
+  const { email } = req.query;
+  const user = await getUser({ email }, true);
   if (user) {
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
     return res.status(200).send({ userData });
