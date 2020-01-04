@@ -176,6 +176,4 @@ router.post('/securityQuestion', async (req, res) => {
   return res.status(403).send({ error: 'user not found' });
 });
 
-router.get('/userEvents', tokenVerification, async (req, res) => res.status(200).send(req.user.eventBasedRoles));
-
 module.exports = router;
