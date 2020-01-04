@@ -1,6 +1,8 @@
+const jwt = require('jsonwebtoken');
 const { compare } = require('../util/bcrypt');
 const { User } = require('../model');
 const { generateSalt, hash } = require('../util/bcrypt');
+const config = require('../../config');
 
 const SALT_WORK_FACTOR = 10;
 
@@ -88,6 +90,15 @@ const getUser = async (queryObject, fullUserObject = false) => {
   return (fullUserObject) ? user : reduceUser(user);
 };
 
+const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => {
+  jwt.verify(token, config.secret, async (err, decoded) => {
+    if (err) return reject(err);
+    const user = await getUser({ _id: decoded });
+    console.log(user);
+    return resolve(user);
+  });
+});
+
 const checkRole = async (_id, eventID) => {
   const user = await User.findById(_id);
   if (!user) { return -1; }
@@ -111,6 +122,7 @@ module.exports = {
   createUser,
   deleteUser,
   authenticateUser,
+  authenticateUserByJWT,
   getUser,
   updateUser,
   updatePassword,

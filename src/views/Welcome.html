@@ -71,7 +71,7 @@
         <li>GET /userByID 
             <ul>
                 <li>query: id </li>
-                <li>returns: 403 on error with message or jwt token on success</li>
+                <li>returns: 403 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>GET /userRoleByID (based on event)
@@ -108,13 +108,13 @@
         <li>POST /login
             <ul>
                 <li>body: username, password</li>
-                <li>returns: 400/401 on error with message or jwt token on success</li>
+                <li>returns: 400/401 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>POST /register
             <ul>
                 <li>body: user object (see hint below for minimal requirements)</li>
-                <li>returns: 400/500 on error with message or jwt token on success</li>
+                <li>returns: 400/500 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>POST /checkSecurityAnswer 
@@ -133,7 +133,7 @@
             <ul>
                 <li>body: object containing new values</li>
                 <li>params: id </li>
-                <li>returns: 400/403/500 on error with message or jwt token on success</li>
+                <li>returns: 400/403/500 on error with message or an object containing a token token on success</li>
             </ul>
         </li><br>
         <li>PATCH /updatePassword 
@@ -146,6 +146,20 @@
     </ul>
     <b>HINT: </b> 
     <span>minimal user object needs to contain firstname, lastname, username, email, password, fieldOfActivity, researchInterest, securityQuestion, securityAnswer</span>
+    <hr>
+    <h1>What to do with the token?</h1>
+    <span>
+        The token contains the user id and can be verified by a secret key from our server. Once verified the api returns the user object.<br>
+        All you need to do is call
+        <ul>
+        <li>GET /decoder
+            <ul>
+                <li>query: token</li>
+                <li>returns: userObject</li>
+            </ul>
+        </li><br>
+    </ul>
+    </span>
     <hr>
     <p>May be implemented soon</p>
     <ul>

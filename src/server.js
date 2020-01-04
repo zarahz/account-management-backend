@@ -25,11 +25,11 @@ app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __
 // user API
 app.use(require('./routes/user'));
 
-// decode user token API
-app.use(require('./routes/decoder'));
-
 // collections API
 app.use(require('./routes/collection'));
+
+// decode user token API
+app.use(require('./routes/decoder'));
 
 // eslint-disable-next-line no-console
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
