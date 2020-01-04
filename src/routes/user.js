@@ -51,7 +51,7 @@ router.post('/register', async (req, res) => {
 });
 
 // check if username unique -> true means username is unique
-router.get('/uniqueUsername', tokenVerification, async (req, res) => {
+router.get('/uniqueUsername', async (req, res) => {
   const { username } = req.query;
   const user = await getUser({ username });
   if (user) {
@@ -61,7 +61,7 @@ router.get('/uniqueUsername', tokenVerification, async (req, res) => {
 });
 
 // check if email unique -> true means email is unique
-router.get('/uniqueEmail', tokenVerification, async (req, res) => {
+router.get('/uniqueEmail', async (req, res) => {
   const { email } = req.query;
   const user = await getUser({ email });
   if (user) {
@@ -70,7 +70,7 @@ router.get('/uniqueEmail', tokenVerification, async (req, res) => {
   return res.status(200).send(true);
 });
 
-router.post('/checkSecurityAnswer', tokenVerification, async (req, res) => {
+router.post('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
   const user = await getUser({ _id: id }, true); // true to get the user object with sensitive data
   if (user !== -1) {
@@ -166,7 +166,7 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   return res.status(200).redirect('/');
 });
 
-router.post('/securityQuestion', tokenVerification, async (req, res) => {
+router.post('/securityQuestion', async (req, res) => {
   const { email } = req.body;
   const user = await getUser({ email }, true);
   if (user) {

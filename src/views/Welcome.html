@@ -70,25 +70,25 @@
         <h3><b>GET</b></h3>
         <li>GET /userByID 
             <ul>
-                <li>query: id </li>
+                <li>query: id, token </li>
                 <li>returns: 403 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>GET /userRoleByID (based on event)
             <ul>
-                <li>query: id, event (event here only means the event id) </li>
+                <li>query: id, event (event here only means the event id), token </li>
                 <li>returns: 403 on error with message or the event role</li>
             </ul>
         </li><br>
         <li>GET /researchInterestByID 
             <ul>
-                <li>query: id</li>
+                <li>query: id, token</li>
                 <li>returns: 403 on error with message or researchInterests on success</li>
             </ul>
         </li><br>
         <li>GET /securityQuestion 
             <ul>
-                <li>query: username</li>
+                <li>query: email</li>
                 <li>returns: 403 on error with message or user id and querstion on success</li>
             </ul>
         </li><br>
@@ -125,20 +125,20 @@
         </li><br>
         <li>POST /deleteUser 
             <ul>
-                <li>body: username, password</li>
+                <li>body: username, password, token</li>
                 <li>returns: 401/403/500 on error with message or 200 on success</li>
             </ul>
         </li><br>
         <li>PATCH /updateUser 
             <ul>
-                <li>body: object containing new values</li>
+                <li>body: object containing new values, token</li>
                 <li>params: id </li>
                 <li>returns: 400/403/500 on error with message or an object containing a token token on success</li>
             </ul>
         </li><br>
         <li>PATCH /updatePassword 
             <ul>
-                <li>body: newPassword</li>
+                <li>body: newPassword, token</li>
                 <li>params: id</li>
                 <li>returns: 400/403/500 on error with message or 200 on success</li>
             </ul>
@@ -150,15 +150,16 @@
     <h1>What to do with the token?</h1>
     <span>
         The token contains the user id and can be verified by a secret key from our server. Once verified the api returns the user object.<br>
-        All you need to do is call
+        You can do that by calling
         <ul>
-        <li>GET /decoder
-            <ul>
-                <li>query: token</li>
-                <li>returns: userObject</li>
-            </ul>
-        </li><br>
-    </ul>
+            <li>GET /decoder
+                <ul>
+                    <li>query: token</li>
+                    <li>returns: userObject</li>
+                </ul>
+            </li><br>
+        </ul>
+        Please be aware that many of the above APIs require the token. Upon login the token is saved in the cookies with key 'user'.
     </span>
     <hr>
     <p>May be implemented soon</p>
