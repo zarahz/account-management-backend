@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
   if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   const token = jwt.sign(user.id, config.secret);
-  res.cookie('user', JSON.stringify(token));
+  res.cookie('token', JSON.stringify(token));
   return res.status(200).send({ token });
 });
 
@@ -161,7 +161,8 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   }
 
   // delete user in cookies
-  res.clearCookie('user', JSON.stringify(user));
+  res.clearCookie('token');
+  res.clearCookie('user');
 
   return res.status(200).redirect('/');
 });
