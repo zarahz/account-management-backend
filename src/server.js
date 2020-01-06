@@ -7,10 +7,6 @@ require('./db');
 const app = express();
 const port = 10014;
 
-/* const corsOptions = {
-  origin: 'https://pwp.um.ifi.lmu.de',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-}; */
 // cors settings
 app.use(morgan('combined'));
 /* app.use(cors({
@@ -18,6 +14,7 @@ app.use(morgan('combined'));
 })); */
 const whitelist = ['https://pwp.um.ifi.lmu.de', 'http://localhost:3000'];
 const checkUrl = (origin, callback) => {
+  console.log(origin);
   if (whitelist.indexOf(origin) !== -1) {
     callback(null, true);
   } else {
