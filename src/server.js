@@ -13,9 +13,10 @@ const port = 10014;
 }; */
 // cors settings
 app.use(morgan('combined'));
-app.use(cors({
+/* app.use(cors({
   origin: '*',
-}));
+})); */
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 app.use(bodyParser.json());
 
