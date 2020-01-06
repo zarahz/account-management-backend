@@ -109,14 +109,14 @@
             <ul>
                 <li>body: username, password</li>
                 <li>returns: 400/401 on error with message or an object containing a token on success</li>
-                <li>cookies: the browser cookies are updated on success with an object containing the token</li>
+                <li>cookies: the browser cookies are updated on success with an object containing the token <b>Please add credentials: 'include' to the fetch, so that the browser can store the cookies</b></li>
             </ul>
         </li><br>
         <li>POST /register
             <ul>
                 <li>body: user object (see hint below for minimal requirements)</li>
                 <li>returns: 400/500 on error with message or an object containing a token on success</li>
-                <li>cookies: the browser cookies are updated on success with an object containing the token</li>
+                <li>cookies: the browser cookies are updated on success with an object containing the token <b>Please add credentials: 'include' to the fetch, so that the browser can store the cookies</b></li>
             </ul>
         </li><br>
         <li>POST /checkSecurityAnswer 
@@ -158,7 +158,7 @@
                 <ul>
                     <li>query: token</li>
                     <li>returns: userObject</li>
-                    <li>cookies: the browser cookies are updated on success with an object containing the user</li>
+                    <li>cookies: the browser cookies are updated on success with an object containing the user <b>Please add credentials: 'include' to the fetch, so that the browser can store the cookies</b></li>
                 </ul>
             </li><br>
         </ul>
