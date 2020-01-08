@@ -9,10 +9,8 @@ const port = 10014;
 
 // cors settings
 app.use(morgan('combined'));
-/* app.use(cors({
-  origin: '*',
-})); */
-app.use(cors({ credentials: true, origin: '*' }));
+app.use(cors({ origin: '*' }));
+// app.use(cors({ credentials: true, origin: '*' }));
 
 app.use(bodyParser.json());
 
