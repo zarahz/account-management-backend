@@ -15,7 +15,7 @@ app.use(morgan('combined'));
 const whitelist = ['https://pwp.um.ifi.lmu.de', 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'];
 const checkUrl = (origin, callback) => {
   console.log(origin);
-  if (whitelist.indexOf(origin) !== -1) {
+  if (!origin || whitelist.indexOf(origin) !== -1) {
     callback(null, true);
   } else {
     callback(new Error('Not allowed by CORS'));
