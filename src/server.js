@@ -12,17 +12,7 @@ app.use(morgan('combined'));
 /* app.use(cors({
   origin: '*',
 })); */
-const whitelist = ['https://pwp.um.ifi.lmu.de', 'http://localhost:3000'];
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-};
-app.use(cors({ credentials: true, origin: corsOptions }));
+app.use(cors({ credentials: true, origin: '*' }));
 
 app.use(bodyParser.json());
 
