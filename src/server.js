@@ -14,7 +14,6 @@ app.use(morgan('combined'));
 })); */
 const whitelist = ['https://pwp.um.ifi.lmu.de', 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'];
 const checkUrl = (origin, callback) => {
-  console.log(origin);
   if (!origin || whitelist.indexOf(origin) !== -1) {
     callback(null, true);
   } else {
@@ -38,4 +37,6 @@ app.use(require('./routes/collection'));
 app.use(require('./routes/decoder'));
 
 // eslint-disable-next-line no-console
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+module.exports = server;

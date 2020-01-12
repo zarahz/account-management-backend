@@ -55,7 +55,7 @@ router.post('/register', async (req, res) => {
 router.get('/uniqueUsername', async (req, res) => {
   const { username } = req.query;
   const user = await getUser({ username });
-  if (user) {
+  if (user !== -1) {
     return res.status(200).send(false);
   }
   return res.status(200).send(true);
@@ -65,7 +65,7 @@ router.get('/uniqueUsername', async (req, res) => {
 router.get('/uniqueEmail', async (req, res) => {
   const { email } = req.query;
   const user = await getUser({ email });
-  if (user) {
+  if (user !== -1) {
     return res.status(200).send(false);
   }
   return res.status(200).send(true);

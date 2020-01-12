@@ -24,7 +24,7 @@ const reduceUser = (user) => ({
   eventbasedRole: user.eventbasedRole,
 });
 
-const createUser = async (userObj) => {
+const createUser = async (userObj, fullUserObject = false) => {
   const newUser = new User(userObj);
   const { username } = newUser;
   const { email } = newUser;
@@ -41,7 +41,7 @@ const createUser = async (userObj) => {
   }
   if (exists !== null) { return exists; }
   await newUser.save();
-  return reduceUser(newUser);
+  return (fullUserObject) ? newUser : reduceUser(newUser);
 };
 
 const authenticateUser = async (username, password) => {
@@ -94,7 +94,6 @@ const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => 
   jwt.verify(token, config.secret, async (err, decoded) => {
     if (err) return reject(err);
     const user = await getUser({ _id: decoded });
-    console.log(user);
     return resolve(user);
   });
 });
