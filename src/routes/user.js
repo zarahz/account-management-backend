@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
   if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
   const token = jwt.sign(user.id, config.secret);
-  res.cookie('token', JSON.stringify(token), { httpOnly: false });
+  res.cookie('token', token, { httpOnly: false });
   return res.status(200).send({ token });
 });
 
@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
       const token = jwt.sign(user.id, config.secret);
-      res.cookie('token', JSON.stringify(token), { httpOnly: false });
+      res.cookie('token', token, { httpOnly: false });
       return res.status(200).send({ token });
     }
     if (user === -1) {
@@ -71,13 +71,15 @@ router.get('/uniqueEmail', async (req, res) => {
   return res.status(200).send(true);
 });
 
-router.post('/checkSecurityAnswer', tokenVerification, async (req, res) => {
+router.post('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
   const user = await getUser({ _id: id }, true); // true to get the user object with sensitive data
   if (user !== -1) {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
     const userAnswer = securityAnswer.toLowerCase().trim();
     if (userAnswer === dbAnswer) {
+      const token = jwt.sign(user.id, config.secret);
+      res.cookie('token', token, { httpOnly: false });
       return res.status(200).end();
     }
     return res.status(400).send({ error: 'wrong security answer' });
@@ -172,8 +174,6 @@ router.post('/securityQuestion', async (req, res) => {
   const { email } = req.body;
   const user = await getUser({ email }, true);
   if (user) {
-    const token = jwt.sign(user.id, config.secret);
-    res.cookie('token', JSON.stringify(token), { httpOnly: false });
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
     return res.status(200).send({ userData });
   }
