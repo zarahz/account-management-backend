@@ -173,7 +173,7 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
 router.post('/securityQuestion', async (req, res) => {
   const { email } = req.body;
   const user = await getUser({ email }, true);
-  if (user) {
+  if (user !== -1) {
     const userData = { id: user.id, securityQuestion: user.securityQuestion };
     return res.status(200).send({ userData });
   }
