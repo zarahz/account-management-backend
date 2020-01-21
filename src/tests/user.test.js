@@ -267,13 +267,70 @@ describe('user', () => {
     const dbUser = await userLib.createUser(testUser);
     const res = await request(app).get(`/userByID?id=${dbUser.id}&token=${token}`);
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('token');
+    expect(res.body).toHaveProperty('user');
     done();
   });
   it('cannot get by id - invalid id', async (done) => {
     const res = await request(app).get(`/userByID?id=000000000000000000000000&token=${token}`);
     expect(res.statusCode).toEqual(403);
     expect(res.body).toHaveProperty('error');
+    done();
+  });
+  it('searches successfully without specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`)
+      .send({
+        searchTerm: 'us',
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.length).not.toEqual(0);
+    done();
+  });
+  it('searches with no result without specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`)
+      .send({
+        searchTerm: 'userZZZZZZZ',
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.length).toEqual(0);
+    done();
+  });
+  it('searches with no searchTerm without specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`);
+    expect(res.statusCode).toEqual(200);
+    done();
+  });
+  it('searches successfully with specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`)
+      .send({
+        searchTerm: 'us',
+        attributes: ['lastname'],
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.length).not.toEqual(0);
+    done();
+  });
+  it('searches with no result with specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`)
+      .send({
+        searchTerm: 'us',
+        attributes: ['firstname'],
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.length).toEqual(0);
+    done();
+  });
+  it('searches with no searchTerm with specific attributes', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).post(`/queryUser?token=${token}`)
+      .send({
+        attributes: ['firstname'],
+      });
+    expect(res.statusCode).toEqual(200);
     done();
   });
 });

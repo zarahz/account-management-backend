@@ -2,7 +2,8 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const {
-  createUser, authenticateUser, getUser, deleteUser, updateUser, updatePassword, checkRole, queryUser,
+  createUser, authenticateUser, getUser, deleteUser, updateUser,
+  updatePassword, checkRole, queryUser,
 } = require('../lib/user');
 const { tokenVerification } = require('./middleware');
 
@@ -95,20 +96,20 @@ router.get('/userRoleByID', tokenVerification, async (req, res) => {
   return res.status(200).send({ role });
 });
 
-router.post('/queryUser', tokenVerification, async (req, res) => {
-  const { searchTerm, attributes } = req.body;
-  if (!searchTerm || searchTerm === ' ') {
-    return res.status(200).end();
-  }
-  const queriedUsers = await queryUser(searchTerm, attributes);
-  return res.status(200).send(queriedUsers);
-});
-
 router.get('/userByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
   const user = await getUser(id);
   if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
   return res.status(200).send({ user });
+});
+
+router.post('/queryUser', tokenVerification, async (req, res) => {
+  const { searchTerm, attributes } = req.body;
+  if (!searchTerm || searchTerm === ' ') {
+    return res.status(200).send([]);
+  }
+  const queriedUsers = await queryUser(searchTerm, attributes);
+  return res.status(200).send(queriedUsers);
 });
 
 router.get('/researchInterestByID', tokenVerification, async (req, res) => {
