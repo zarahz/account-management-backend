@@ -90,6 +90,26 @@ const getUser = async (queryObject, fullUserObject = false) => {
   return (fullUserObject) ? user : reduceUser(user);
 };
 
+const queryUser = async (searchTerm, attributes = ['firstname', 'lastname', 'username', 'email']) => {
+  // Create regex
+  // Split searchterm and replace whitespaces with OR
+  let regexString = '';
+  regexString = searchTerm.split(' ').join('|');
+  // modifier ig: g = global (return ALL matches) i = insensitive
+  const regex = new RegExp(regexString, 'ig');
+
+  // Create search condition and search in db for each attribute
+  const searchCondition = [];
+  attributes.forEach((attribute) => {
+    searchCondition.push({ [attribute]: regex });
+  });
+  const users = await User.find({
+    $or: searchCondition,
+  });
+  // return reduced user to secure sensible data
+  return users.map((user) => reduceUser(user));
+};
+
 const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => {
   jwt.verify(token, config.secret, async (err, decoded) => {
     if (err) return reject(err);
@@ -126,4 +146,5 @@ module.exports = {
   updateUser,
   updatePassword,
   checkRole,
+  queryUser,
 };

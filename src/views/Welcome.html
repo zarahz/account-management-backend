@@ -127,21 +127,31 @@
         </li><br>
         <li>POST /deleteUser 
             <ul>
-                <li>body: username, password, token</li>
+                <li>query: token</li>
+                <li>body: username, password</li>
                 <li>returns: 401/403/500 on error with message or 200 on success</li>
             </ul>
         </li><br>
         <li>PATCH /updateUser 
             <ul>
-                <li>body: object containing new values, token</li>
+                <li>query: token</li>
+                <li>body: object containing new values</li>
                 <li>params: id </li>
                 <li>returns: 400/403/500 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>PATCH /updatePassword 
             <ul>
-                <li>body: newPassword, token</li>
+                <li>query: token</li>
+                <li>body: newPassword</li>
                 <li>params: id</li>
+                <li>returns: 400/403/500 on error with message or 200 on success</li>
+            </ul>
+        </li><br>
+        <li>POST /queryUser
+            <ul>
+                <li>query: token</li>
+                <li>body: searchTerm, attributes ( OPTIONAL - array containing user attributes i.e. ["firstname"])</li>
                 <li>returns: 400/403/500 on error with message or 200 on success</li>
             </ul>
         </li><br>

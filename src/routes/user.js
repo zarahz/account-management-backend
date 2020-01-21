@@ -2,7 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const {
-  createUser, authenticateUser, getUser, deleteUser, updateUser, updatePassword, checkRole,
+  createUser, authenticateUser, getUser, deleteUser, updateUser, updatePassword, checkRole, queryUser,
 } = require('../lib/user');
 const { tokenVerification } = require('./middleware');
 
@@ -95,12 +95,14 @@ router.get('/userRoleByID', tokenVerification, async (req, res) => {
   return res.status(200).send({ role });
 });
 
-/* router.post('/usersByID', tokenVerification, async (req, res) => {
+router.post('/queryUser', tokenVerification, async (req, res) => {
   const { searchTerm, attributes } = req.body;
-  if(attributes != null){
-    //const users =
+  if (!searchTerm || searchTerm === ' ') {
+    return res.status(200).end();
   }
-}); */
+  const queriedUsers = await queryUser(searchTerm, attributes);
+  return res.status(200).send(queriedUsers);
+});
 
 router.get('/userByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
