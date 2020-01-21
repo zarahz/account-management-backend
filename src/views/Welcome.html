@@ -71,7 +71,7 @@
         <li>GET /userByID 
             <ul>
                 <li>query: id, token </li>
-                <li>returns: 403 on error with message or an object containing a token on success</li>
+                <li>returns: 403 on error with message or an object containing a user on success</li>
             </ul>
         </li><br>
         <li>GET /userRoleByID (based on event)
@@ -135,7 +135,7 @@
             <ul>
                 <li>body: object containing new values, token</li>
                 <li>params: id </li>
-                <li>returns: 400/403/500 on error with message or an object containing a token token on success</li>
+                <li>returns: 400/403/500 on error with message or an object containing a token on success</li>
             </ul>
         </li><br>
         <li>PATCH /updatePassword 

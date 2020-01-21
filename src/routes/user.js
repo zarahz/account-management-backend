@@ -95,12 +95,18 @@ router.get('/userRoleByID', tokenVerification, async (req, res) => {
   return res.status(200).send({ role });
 });
 
+/* router.post('/usersByID', tokenVerification, async (req, res) => {
+  const { searchTerm, attributes } = req.body;
+  if(attributes != null){
+    //const users =
+  }
+}); */
+
 router.get('/userByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
   const user = await getUser(id);
   if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
-  const token = jwt.sign(user.id, config.secret);
-  return res.status(200).send({ token });
+  return res.status(200).send({ user });
 });
 
 router.get('/researchInterestByID', tokenVerification, async (req, res) => {
@@ -155,7 +161,6 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   if (user === -2) {
     return res.status(401).send({ error: 'Unauthorized!' });
   }
-
 
   // delete user in database
   const deleted = await deleteUser(username);
