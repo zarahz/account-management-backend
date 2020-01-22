@@ -333,4 +333,57 @@ describe('user', () => {
     expect(res.statusCode).toEqual(200);
     done();
   });
+  it('fetch research interest by id successfully', async (done) => {
+    const dbUser = await userLib.createUser(testUser);
+    const res = await request(app).get(`/researchInterestByID?id=${dbUser.id}&token=${token}`);
+    expect(res.statusCode).toEqual(200);
+    done();
+  });
+  it('fetch research interest by id - user not found', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).get(`/researchInterestByID?id=000000000000000000000000&token=${token}`);
+    expect(res.statusCode).not.toEqual(200);
+    expect(res.body).toHaveProperty('error');
+    done();
+  });
+  it('updates data successfully ', async (done) => {
+    const dbUser = await userLib.createUser(testUser);
+    const res = await request(app).patch(`/updateUser/${dbUser.id}/token=${token}`)
+      .send({
+        username: 'updated Username',
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('token');
+    done();
+  });
+  it('updates data - duplicate values ', async (done) => {
+    const dbUser = await userLib.createUser(testUser);
+    const dbUser2 = await userLib.createUser(testUser2);
+    const res = await request(app).patch(`/updateUser/${dbUser.id}/token=${token}`)
+      .send({
+        username: dbUser2.username,
+      });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('error');
+    done();
+  });
+  it('updates data - no user found', async (done) => {
+    await userLib.createUser(testUser);
+    const res = await request(app).patch(`/updateUser/000000000000000000000000/token=${token}`)
+      .send({
+        username: 'username',
+      });
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toHaveProperty('error');
+    done();
+  });
+  it('updates password successfully', async (done) => {
+    const dbUser = await userLib.createUser(testUser);
+    const res = await request(app).patch(`/updatePassword/${dbUser.id}/token=${token}`)
+      .send({
+        newPassword: 'newPassword',
+      });
+    expect(res.statusCode).toEqual(200);
+    done();
+  });
 });

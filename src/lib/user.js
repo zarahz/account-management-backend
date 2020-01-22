@@ -90,6 +90,11 @@ const getUser = async (queryObject, fullUserObject = false) => {
   return (fullUserObject) ? user : reduceUser(user);
 };
 
+const getUsers = async (fullUserObject = false) => {
+  const users = await User.find({});
+  return (fullUserObject) ? users : users.map((user) => reduceUser(user));
+};
+
 const queryUser = async (searchTerm, attributes = ['firstname', 'lastname', 'username', 'email']) => {
   // Create regex
   // Split searchterm and replace whitespaces with OR
@@ -147,4 +152,5 @@ module.exports = {
   updatePassword,
   checkRole,
   queryUser,
+  getUsers,
 };

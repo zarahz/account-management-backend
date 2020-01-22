@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const {
   createUser, authenticateUser, getUser, deleteUser, updateUser,
-  updatePassword, checkRole, queryUser,
+  updatePassword, checkRole, queryUser, getUsers,
 } = require('../lib/user');
 const { tokenVerification } = require('./middleware');
 
@@ -94,6 +94,12 @@ router.get('/userRoleByID', tokenVerification, async (req, res) => {
   if (role === -1) { return res.status(403).send({ error: 'no user found' }); }
   if (role === -2) { return res.status(403).send({ error: 'no event found' }); }
   return res.status(200).send({ role });
+});
+
+router.get('/users', tokenVerification, async (req, res) => {
+  let users = [];
+  users = await getUsers();
+  return res.status(200).send({ users });
 });
 
 router.get('/userByID', tokenVerification, async (req, res) => {
