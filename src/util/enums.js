@@ -21,7 +21,29 @@ const securityQuestionsDE = ['Wie war die Hausnummer und der Straßenname, in de
   'In welcher Stadt lernten sich deine Mutter und dein Vater kennen?'];
 
 const researchInterests = [
-  'VR', 'AR', 'AV',
+  'Artificial Intelligence',
+  'Machine Learning',
+  'Computer Vision',
+  'Natural language processing',
+  'Web',
+  'Mobile and Multimedia Technologies',
+  'Networks and Communications',
+  'Hardware, Power and Energy',
+  'Security and Privacy',
+  'Computational Theory',
+  'Algorithms and Mathematics',
+  'Information Systems',
+  'Search',
+  'Information Retrieval',
+  'Database Systems',
+  'Data Mining',
+  'Data Science',
+  'Graphics and Computer-Aided Design',
+  'Architecture',
+  'Embedded Systems and Electronics',
+  'Robotics',
+  'Human Computer Interaction',
+  'Software Engineering and Programming Languages',
 ];
 
 module.exports = {
