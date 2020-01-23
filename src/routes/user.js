@@ -181,7 +181,7 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   res.clearCookie('token');
   res.clearCookie('user');
 
-  return res.status(200).redirect('/');
+  return res.status(200).end();
 });
 
 router.post('/securityQuestion', async (req, res) => {
