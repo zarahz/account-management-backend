@@ -12,15 +12,24 @@ app.use(morgan('combined'));
 /* app.use(cors({
   origin: '*',
 })); */
-/* const whitelist = ['https://pwp.um.ifi.lmu.de', 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'];
+const whitelist = ['https://pwp.um.ifi.lmu.de', 'localhost']; // 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'
 const checkUrl = (origin, callback) => {
-  if (!origin || whitelist.indexOf(origin) !== -1) {
+  console.log(origin);
+  if (!origin) {
+    callback(new Error('Not allowed by CORS'));
+  }
+  whitelist.forEach((entry) => {
+    if (entry.includes(origin) || origin.includes(entry)) {
+      callback(null, true);
+    }
+  });
+  /* if (!origin || whitelist.indexOf(origin) !== -1) {
     callback(null, true);
   } else {
     callback(new Error('Not allowed by CORS'));
-  }
-}; */
-app.use(cors({ credentials: true, origin: '*' }));
+  } */
+};
+app.use(cors({ credentials: true, origin: checkUrl }));
 
 app.use(bodyParser.json());
 
