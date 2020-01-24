@@ -1,28 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const morgan = require('morgan');
 require('./db');
 
 const app = express();
 const port = 10014;
 
 // cors settings
-app.use(morgan('combined'));
 /* app.use(cors({
   origin: '*',
 })); */
-const whitelist = ['https://pwp.um.ifi.lmu.de', 'localhost']; // 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'
+const whitelist = ['pwp.um.ifi.lmu.de', 'localhost']; // 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'
 const checkUrl = (origin, callback) => {
-  console.log(origin);
-  if (!origin) {
-    callback(new Error('Not allowed by CORS'));
-  }
+  console.log(`origin:${origin}`);
+  let match = false;
   whitelist.forEach((entry) => {
-    if (entry.includes(origin) || origin.includes(entry)) {
+    if (!match && (
+      !origin || origin.includes(entry))) {
+      console.log('cors success!');
       callback(null, true);
+      console.log(entry);
+      match = true;
     }
   });
+
+  if (!match) {
+    callback(new Error('Not allowed by CORS'));
+  }
+
   /* if (!origin || whitelist.indexOf(origin) !== -1) {
     callback(null, true);
   } else {
