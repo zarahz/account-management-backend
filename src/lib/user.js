@@ -118,7 +118,8 @@ const queryUser = async (searchTerm, attributes = ['firstname', 'lastname', 'use
 const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => {
   jwt.verify(token, config.secret, async (err, decoded) => {
     if (err) return reject(err);
-    const user = await getUser({ _id: decoded });
+    console.log(`decoded:${JSON.parse(decoded)}`);
+    const user = await getUser({ _id: JSON.parse(decoded) });
     return resolve(user);
   });
 });

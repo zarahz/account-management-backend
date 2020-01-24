@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
 
   if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
   if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
-  const token = jwt.sign(user.id, config.secret);
+  const token = jwt.sign(JSON.stringify(user.id), config.secret);
   res.cookie('token', token, { httpOnly: false });
   return res.status(200).send({ token });
 });
@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
   try {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
-      const token = jwt.sign(user.id, config.secret);
+      const token = jwt.sign(JSON.stringify(user.id), config.secret);
       res.cookie('token', token, { httpOnly: false });
       return res.status(200).send({ token });
     }
@@ -79,7 +79,7 @@ router.post('/checkSecurityAnswer', async (req, res) => {
     const dbAnswer = user.securityAnswer.toLowerCase().trim();
     const userAnswer = securityAnswer.toLowerCase().trim();
     if (userAnswer === dbAnswer) {
-      const token = jwt.sign(user.id, config.secret);
+      const token = jwt.sign(JSON.stringify(user.id), config.secret);
       res.cookie('token', token, { httpOnly: false });
       return res.status(200).end();
     }
