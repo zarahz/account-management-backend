@@ -50,15 +50,6 @@
     <hr>
 	<h1>How to use our service:</h1>
     <br/>
-    <p>Token Validation</p>
-    <ul>
-        <li>Get /validateToken
-            <ul>
-                <li>query: token</li>
-                <li>returns: 403 on error with message or 200 on success</li>
-            </ul>
-        </li><br>
-    </ul>
     <p>Collections</p>
     <ul>
         <li>POST /securityQuestions
@@ -176,7 +167,8 @@
     <hr>
     <h1>What to do with the token?</h1>
     <span>
-        The token contains the user id and can be verified by a secret key from our server. Once verified the api returns the user object.<br>
+        The token contains the user id and can be verified by a secret key from our server. 
+        Once verified the api returns the user object.<br>
         You can do that by calling
         <ul>
             <li>GET /token
@@ -184,6 +176,12 @@
                     <li>query: token</li>
                     <li>returns: userObject</li>
                     <li>cookies: the browser cookies are updated on success with an object containing the user <b>Please add credentials: 'include' to the fetch, so that the browser can store the cookies</b></li>
+                </ul>
+            </li><br>
+            <li>Get /validateToken
+                <ul>
+                    <li>query: token</li>
+                    <li>returns: 403 on error with message or 200 on success</li>
                 </ul>
             </li><br>
         </ul>
