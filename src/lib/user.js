@@ -127,8 +127,6 @@ const queryUser = async (searchTerm, attributes = ['firstname', 'lastname', 'use
 const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => {
   jwt.verify(token, config.secret, async (err, decoded) => {
     if (err) return reject(err);
-    // console.log(`decoded:${JSON.parse(decoded)}`);
-    console.log(decoded);
     const user = await getUser({ _id: JSON.parse(decoded) });
     return (user !== -1) ? resolve(user) : -1;
   });
@@ -148,20 +146,17 @@ const checkRole = async (_id, eventID) => {
 
 const checkUniqueFieldsByID = async (username, email, id) => {
   let exists = null;
-
   // if a user exists in the database with the given username or email
   // check if the ids match
   // if not then the user is trying to update a unique field with a taken value
   if (username) {
-    const dbUserWithUsername = await getUser(username);
+    const dbUserWithUsername = await getUser({ username });
     if (dbUserWithUsername !== -1 && dbUserWithUsername.id !== id) {
       exists = -1;
     }
   }
   if (email) {
-    const dbUserWithEmail = await getUser(email);
-    console.log(dbUserWithEmail);
-    console.log(email);
+    const dbUserWithEmail = await getUser({ email });
     if (dbUserWithEmail !== -1 && dbUserWithEmail.id !== id) {
       exists = -2;
     }

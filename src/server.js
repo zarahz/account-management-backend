@@ -9,7 +9,6 @@ const port = 10014;
 // cors settings
 const whitelist = ['pwp.um.ifi.lmu.de', 'localhost']; // 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'
 const checkUrl = (origin, callback) => {
-  console.log(`origin:${origin}`);
   let match = false;
   whitelist.forEach((entry) => {
     if (!match && (

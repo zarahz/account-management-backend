@@ -73,7 +73,6 @@ router.get('/researchInterestByID', tokenVerification, async (req, res) => {
 router.patch('/updateUser/:id', tokenVerification, async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const updatedUser = await updateUser(id, req.body);
     if (!updatedUser) { return res.status(403).send({ error: 'no user found' }); }
     if (updatedUser === -1) {
