@@ -129,7 +129,7 @@ const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => 
     if (err) return reject(err);
     // console.log(`decoded:${JSON.parse(decoded)}`);
     console.log(decoded);
-    const user = await getUser({ _id: decoded });
+    const user = await getUser({ _id: JSON.parse(decoded) });
     return (user !== -1) ? resolve(user) : -1;
   });
 });
