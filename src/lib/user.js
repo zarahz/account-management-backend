@@ -8,6 +8,7 @@ const SALT_WORK_FACTOR = 10;
 
 const reduceUser = (user) => ({
   id: user.id,
+  title: user.title,
   gender: user.gender,
   role: user.role,
   firstname: user.firstname,
@@ -24,10 +25,7 @@ const reduceUser = (user) => ({
   eventbasedRole: user.eventbasedRole,
 });
 
-const createUser = async (userObj, fullUserObject = false) => {
-  const newUser = new User(userObj);
-  const { username } = newUser;
-  const { email } = newUser;
+const checkUniqueFields = async (username, email) => {
   let exists = null;
   let userN = null;
   let userE = null;
@@ -40,6 +38,17 @@ const createUser = async (userObj, fullUserObject = false) => {
     exists = -2;
   }
   if (exists !== null) { return exists; }
+  return null;
+};
+
+const createUser = async (userObj, fullUserObject = false) => {
+  const newUser = new User(userObj);
+  const { username } = newUser;
+  const { email } = newUser;
+  const alreadyExists = checkUniqueFields(username, email);
+  if (alreadyExists) {
+    return alreadyExists;
+  }
   await newUser.save();
   return (fullUserObject) ? newUser : reduceUser(newUser);
 };
@@ -118,9 +127,9 @@ const queryUser = async (searchTerm, attributes = ['firstname', 'lastname', 'use
 const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => {
   jwt.verify(token, config.secret, async (err, decoded) => {
     if (err) return reject(err);
-    console.log(`decoded:${JSON.parse(decoded)}`);
+    // console.log(`decoded:${JSON.parse(decoded)}`);
     const user = await getUser({ _id: JSON.parse(decoded) });
-    return resolve(user);
+    return (user !== -1) ? resolve(user) : -1;
   });
 });
 
@@ -136,11 +145,38 @@ const checkRole = async (_id, eventID) => {
   return role; // event not found
 };
 
+const checkUniqueFieldsByID = async (username, email, id) => {
+  let exists = null;
+
+  // if a user exists in the database with the given username or email
+  // check if the ids match
+  // if not then the user is trying to update a unique field with a taken value
+  if (username) {
+    const dbUserWithUsername = await getUser(username);
+    if (dbUserWithUsername !== -1 && dbUserWithUsername.id !== id) {
+      exists = -1;
+    }
+  }
+  if (email) {
+    const dbUserWithEmail = await getUser(email);
+    console.log(dbUserWithEmail);
+    console.log(email);
+    if (dbUserWithEmail !== -1 && dbUserWithEmail.id !== id) {
+      exists = -2;
+    }
+  }
+
+  return exists;
+};
+
 const updateUser = async (id, userObj) => {
+  const duplicationError = await checkUniqueFieldsByID(userObj.username, userObj.email, id);
+  if (duplicationError) {
+    return duplicationError;
+  }
   const filter = { _id: id };
   const userUpdated = await User.findOneAndUpdate(filter, userObj, { new: true });
-  if (!userUpdated) { return -1; }
-  return reduceUser(userUpdated);
+  return (!userUpdated) ? null : reduceUser(userUpdated);
 };
 
 module.exports = {

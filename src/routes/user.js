@@ -1,31 +1,12 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const config = require('../../config');
 const {
   createUser, authenticateUser, getUser, deleteUser, updateUser,
   updatePassword, checkRole, queryUser, getUsers,
 } = require('../lib/user');
+const { generateToken } = require('../util/sign');
 const { tokenVerification } = require('./middleware');
 
 const router = express.Router();
-
-/**
- * login should get a redirect URL as param
- * when login was successful route to the redirect
- * and save the user in domain cookies
- * -> domain is used for all services
- * --> all services get user data!
- */
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = await authenticateUser(username, password);
-
-  if (user === -1) { return res.status(400).send({ error: 'no user found' }); }
-  if (user === -2) { return res.status(401).send({ error: 'Unauthorized!' }); }
-  const token = jwt.sign(JSON.stringify(user.id), config.secret);
-  res.cookie('token', token, { httpOnly: false });
-  return res.status(200).send({ token });
-});
 
 router.post('/register', async (req, res) => {
   // user needs unique entries for database for email and username
@@ -33,7 +14,7 @@ router.post('/register', async (req, res) => {
   try {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
-      const token = jwt.sign(JSON.stringify(user.id), config.secret);
+      const token = generateToken(user.id);
       res.cookie('token', token, { httpOnly: false });
       return res.status(200).send({ token });
     }
@@ -50,42 +31,6 @@ router.post('/register', async (req, res) => {
     return res.status(500).send({ error: error.message });
   }
   return res.status(500).send({ error: 'error' });
-});
-
-// check if username unique -> true means username is unique
-router.get('/uniqueUsername', async (req, res) => {
-  const { username } = req.query;
-  const user = await getUser({ username });
-  if (user !== -1) {
-    return res.status(200).send(false);
-  }
-  return res.status(200).send(true);
-});
-
-// check if email unique -> true means email is unique
-router.get('/uniqueEmail', async (req, res) => {
-  const { email } = req.query;
-  const user = await getUser({ email });
-  if (user !== -1) {
-    return res.status(200).send(false);
-  }
-  return res.status(200).send(true);
-});
-
-router.post('/checkSecurityAnswer', async (req, res) => {
-  const { id, securityAnswer } = req.body;
-  const user = await getUser({ _id: id }, true); // true to get the user object with sensitive data
-  if (user !== -1) {
-    const dbAnswer = user.securityAnswer.toLowerCase().trim();
-    const userAnswer = securityAnswer.toLowerCase().trim();
-    if (userAnswer === dbAnswer) {
-      const token = jwt.sign(JSON.stringify(user.id), config.secret);
-      res.cookie('token', token, { httpOnly: false });
-      return res.status(200).end();
-    }
-    return res.status(400).send({ error: 'wrong security answer' });
-  }
-  return res.status(403).send({ error: 'user not found' });
 });
 
 router.get('/userRoleByID', tokenVerification, async (req, res) => {
@@ -128,9 +73,16 @@ router.get('/researchInterestByID', tokenVerification, async (req, res) => {
 router.patch('/updateUser/:id', tokenVerification, async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id);
     const updatedUser = await updateUser(id, req.body);
-    if (updatedUser === -1) { return res.status(403).send({ error: 'no user found' }); }
-    const token = jwt.sign(JSON.stringify(updatedUser.id), config.secret);
+    if (!updatedUser) { return res.status(403).send({ error: 'no user found' }); }
+    if (updatedUser === -1) {
+      return res.status(400).send({ error: 'username already exists' });
+    }
+    if (updatedUser === -2) {
+      return res.status(400).send({ error: 'this email is already used' });
+    }
+    const token = generateToken(updatedUser.id);
     return res.status(200).send({ token });
   } catch (error) {
     if (error.code === 11000) {
@@ -182,16 +134,6 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   res.clearCookie('user');
 
   return res.status(200).end();
-});
-
-router.post('/securityQuestion', async (req, res) => {
-  const { email } = req.body;
-  const user = await getUser({ email }, true);
-  if (user !== -1) {
-    const userData = { id: user.id, securityQuestion: user.securityQuestion };
-    return res.status(200).send({ userData });
-  }
-  return res.status(403).send({ error: 'user not found' });
 });
 
 module.exports = router;
