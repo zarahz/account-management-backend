@@ -8,9 +8,14 @@ const { tokenVerification } = require('./middleware');
 
 const router = express.Router();
 
+/**
+ * Endpoint to enable user registration. After storing the new user successfully in the
+ * database a token is generated, returned and stored as cookie.
+ * On failure an error message with respective status is returned.
+ *
+ * body: user object to be registered
+ */
 router.post('/register', async (req, res) => {
-  // user needs unique entries for database for email and username
-  // used dummy number to ensure uniqueness
   try {
     const user = await createUser(req.body);
     if (user && Object.keys(user).length !== 0) {
@@ -33,6 +38,12 @@ router.post('/register', async (req, res) => {
   return res.status(500).send({ error: 'error' });
 });
 
+/**
+ * First the middleware checks the token. Afterwards the user id and event id are used to fetch
+ * the eventbasedRole. On success the role is returned.
+ *
+ * query: token, id, event
+ */
 router.get('/userRoleByID', tokenVerification, async (req, res) => {
   const { id, event } = req.query;
   const role = await checkRole(id, event);

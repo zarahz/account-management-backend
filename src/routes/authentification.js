@@ -11,6 +11,7 @@ const router = express.Router();
 
 /**
  * An Endpoint that decodes token and returns the user, whom id is signed within the token.
+ * The user cookie is also set for convenience.
  *
  * res.query: token
  */
