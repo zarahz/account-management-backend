@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
  * An endpoint to check whether a given security answer matches to the answer saved in the database.
  * If the answer matches a token is generated and status 200 is returned
  *
- * req.body : user id, securityAnswer
+ * req.body : id, securityAnswer
  */
 router.post('/checkSecurityAnswer', async (req, res) => {
   const { id, securityAnswer } = req.body;
@@ -79,10 +79,10 @@ router.post('/securityQuestion', async (req, res) => {
 /**
  * Validates a given token with the set secret to enable more security for the other services.
  *
- * req.query: token
+ * req.query: id, token
  */
 router.get('/validateToken', async (req, res) => {
-  const isValid = await validateToken(req.query.token);
+  const isValid = await validateToken(req.query.token, req.query.id);
   if (!isValid) {
     return res.status(401).send({ error: 'Unauthorized!' });
   }

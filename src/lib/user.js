@@ -45,7 +45,7 @@ const createUser = async (userObj, fullUserObject = false) => {
   const newUser = new User(userObj);
   const { username } = newUser;
   const { email } = newUser;
-  const alreadyExists = checkUniqueFields(username, email);
+  const alreadyExists = await checkUniqueFields(username, email);
   if (alreadyExists) {
     return alreadyExists;
   }
