@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios').default;
 const {
   createUser, authenticateUser, getUser, deleteUser, updateUser,
   updatePassword, checkRole, queryUser, getUsers,
@@ -132,6 +133,8 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
   if (user === -2) {
     return res.status(401).send({ error: 'Unauthorized!' });
   }
+  // cancel events that are hosted by the user
+  axios.put(`https://pwp.um.ifi.lmu.de/g05/events/leave/${user.id}/${req.query.token}`);
 
   // delete user in database
   const deleted = await deleteUser(username);
