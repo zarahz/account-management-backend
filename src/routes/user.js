@@ -134,7 +134,8 @@ router.post('/deleteUser', tokenVerification, async (req, res) => {
     return res.status(401).send({ error: 'Unauthorized!' });
   }
   // cancel events that are hosted by the user
-  axios.put(`https://pwp.um.ifi.lmu.de/g05/events/leave/${user.id}/${req.query.token}`);
+  await axios.put(`https://pwp.um.ifi.lmu.de/g05/events/leave/${user.id}/${req.query.token}`)
+    .catch(() => res.status(500).send({ error: 'Deletion failed' }));
 
   // delete user in database
   const deleted = await deleteUser(username);
