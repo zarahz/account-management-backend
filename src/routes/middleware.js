@@ -24,6 +24,7 @@ const tokenVerification = async (req, res, next) => {
     req.user = user;
     return next();
   } catch (error) {
+    console.log('-------- tokenVerification ------- Catch!!!');
     return res.status(401).end();
   }
 };
