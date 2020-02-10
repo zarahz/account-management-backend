@@ -268,8 +268,11 @@ const updateUser = async (id, userObj) => {
   if (duplicationError) {
     return duplicationError;
   }
+  // filter the db for the id, update the entry and return the updated object
   const filter = { _id: id };
   const userUpdated = await User.findOneAndUpdate(filter, userObj, { new: true });
+  // if no user is found or something went wrong the method returns null
+  // else the updated user is returned
   return (!userUpdated) ? null : reduceUser(userUpdated);
 };
 

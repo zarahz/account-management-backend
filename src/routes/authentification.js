@@ -1,7 +1,5 @@
 const express = require('express');
-const {
-  authenticateUser, getUser,
-} = require('../lib/user');
+const { authenticateUser, getUser } = require('../lib/user');
 const { tokenVerification } = require('./middleware');
 const { generateToken, validateToken } = require('../util/sign');
 

@@ -40,8 +40,7 @@ router.post('/register', async (req, res) => {
 });
 
 /**
- * First the middleware checks the token. Afterwards the user id and event id are used to fetch
- * the eventbasedRole. On success the role is returned.
+ * The user id and event id are used to fetch the eventbasedRole. On success the role is returned.
  *
  * query: token, id, event
  */
@@ -53,12 +52,22 @@ router.get('/userRoleByID', tokenVerification, async (req, res) => {
   return res.status(200).send({ role });
 });
 
+/**
+ * Endpoint to get all users
+ *
+ * query: token
+ */
 router.get('/users', tokenVerification, async (req, res) => {
   let users = [];
   users = await getUsers();
   return res.status(200).send({ users });
 });
 
+/**
+ * Endpoint to get user with a specific id.
+ *
+ * query: token, id
+ */
 router.get('/userByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
   const user = await getUser(id);
@@ -66,6 +75,15 @@ router.get('/userByID', tokenVerification, async (req, res) => {
   return res.status(200).send({ user });
 });
 
+/**
+ * Endpoint to get all users matching the searchterm. The requestor can also provide
+ * an attributes list in which the searchterm is searched for.
+ * (i.e. ["researchInterest"] as attributes and "machine" as searchterm)
+ * If no attribute list is provided it will search in username, last- and firstname and email.
+ *
+ * query: token
+ * body: searchTerm, attributes
+ */
 router.post('/queryUser', tokenVerification, async (req, res) => {
   const { searchTerm, attributes } = req.body;
   if (!searchTerm || searchTerm === ' ') {
@@ -75,6 +93,11 @@ router.post('/queryUser', tokenVerification, async (req, res) => {
   return res.status(200).send(queriedUsers);
 });
 
+/**
+ * Endpoint to get all researchInterests of a specific user.
+ *
+ * query: token, id
+ */
 router.get('/researchInterestByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
   const user = await getUser({ id });
@@ -82,6 +105,13 @@ router.get('/researchInterestByID', tokenVerification, async (req, res) => {
   return res.status(200).send(user.researchInterest);
 });
 
+/**
+ * Endpoint to update a user.
+ *
+ * params: id
+ * query: token
+ * body: object containing new values
+ */
 router.patch('/updateUser/:id', tokenVerification, async (req, res) => {
   try {
     const { id } = req.params;
@@ -103,6 +133,13 @@ router.patch('/updateUser/:id', tokenVerification, async (req, res) => {
   }
 });
 
+/**
+ * Endpoint to update the password of a user.
+ *
+ * params: id
+ * query: token
+ * body: newPassword
+ */
 router.patch('/updatePassword/:id', tokenVerification, async (req, res) => {
   const { newPassword } = req.body;
   const { id } = req.params;
@@ -122,6 +159,12 @@ router.patch('/updatePassword/:id', tokenVerification, async (req, res) => {
   }
 });
 
+/**
+ * Endpoint to delete a user.
+ *
+ * query: token
+ * body: username, password
+ */
 router.post('/deleteUser', tokenVerification, async (req, res) => {
   const { username, password } = req.body;
   const user = await authenticateUser(username, password);

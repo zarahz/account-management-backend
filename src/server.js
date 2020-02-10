@@ -6,9 +6,10 @@ require('./db');
 const app = express();
 const port = 10014;
 
-// cors settings
-const whitelist = ['pwp.um.ifi.lmu.de', 'localhost']; // 'https://pwp.um.ifi.lmu.de/g14', 'http://localhost:3000'
+// cors settings to allow the whitelist urls to access the api
+const whitelist = ['pwp.um.ifi.lmu.de', 'localhost'];
 const checkUrl = (origin, callback) => {
+  // check if the current url is contained in the whitelist
   let match = false;
   whitelist.forEach((entry) => {
     if (!match && (
@@ -17,11 +18,12 @@ const checkUrl = (origin, callback) => {
       match = true;
     }
   });
-
+  // if no whitelist entry matched do not allow access
   if (!match) {
     callback(new Error('Not allowed by CORS'));
   }
 };
+// activate the cors functionality
 app.use(cors({ credentials: true, origin: checkUrl }));
 
 app.use(bodyParser.json());
@@ -32,7 +34,7 @@ app.get('/', async (req, res) => { res.sendFile('views/Welcome.html', { root: __
 // user API
 app.use(require('./routes/user'));
 
-// authentification API
+// Form Validation API
 app.use(require('./routes/formValidation'));
 
 // collections API

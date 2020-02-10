@@ -5,11 +5,11 @@ const SALT_WORK_FACTOR = 10;
 
 // the user schema and how it is stored in the database
 const User = new Schema({
-  title: { type: String }, // maybe predefined and select via dropdown
-  gender: { type: String }, // select via dropdown?
+  title: { type: String },
+  gender: { type: String },
   firstname: { type: String, required: true, trim: true },
   lastname: { type: String, required: true, trim: true },
-  username: { // needs to be trimmed in frontend?
+  username: {
     type: String, unique: true, required: true, trim: true,
   },
   email: {
@@ -18,8 +18,8 @@ const User = new Schema({
   password: { type: String, required: true },
   organisation: { type: String, trim: true },
   address: { type: String, trim: true },
-  city: { type: String }, // maybe also predefined via npm module
-  country: { type: String }, // maybe also predefined via npm module
+  city: { type: String },
+  country: { type: String },
   zipCode: { type: Number },
   fieldOfActivity: { type: String, required: true, trim: true },
   researchInterest: { type: Array, required: true }, // predefined in enums
@@ -32,15 +32,16 @@ const User = new Schema({
       event: { type: Number }, // contains id of event
     },
   ],
-  // additional fields to be added:
+  // additional fields to be added in future:
   // social media links, avatar image
   // (relation to other users), (payment), (about text)
 });
 
-// encrypt password before saving
+/**
+ * Method to encrypt password before a user is saved.
+ */
 User.pre('save', async function callback(next) {
   const user = this;
-
   if (!user.isModified('password')) return next();
 
   try {
