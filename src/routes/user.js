@@ -100,7 +100,7 @@ router.post('/queryUser', tokenVerification, async (req, res) => {
  */
 router.get('/researchInterestByID', tokenVerification, async (req, res) => {
   const id = { _id: req.query.id };
-  const user = await getUser({ id });
+  const user = await getUser({ _id: id });
   if (user === -1) { return res.status(403).send({ error: 'no user found' }); }
   return res.status(200).send(user.researchInterest);
 });

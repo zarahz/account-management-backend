@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "lint": "eslint --fix src",
-    "test": "jest --detectOpenHandles src/tests"
+    "test": "jest src/tests --runInBand --forceExit"
   },
   "homepage": "https://pwp.um.ifi.lmu.de/g14/",
   "author": "",

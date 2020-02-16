@@ -5,7 +5,6 @@ const { generateSalt, hash } = require('../util/bcrypt');
 const config = require('../../config');
 
 const SALT_WORK_FACTOR = 10;
-
 /**
  * This method creates a new userobject with fever attributes so the sensible data are kept
  * save (i.e. password and security answer). The full userobject is only handed over to the
@@ -31,6 +30,20 @@ const reduceUser = (user) => ({
   researchInterest: user.researchInterest,
   eventbasedRole: user.eventbasedRole,
 });
+
+/**
+ * Gets ONE database user through a queryObject containing attributes and
+ * the corresponding filter values. Returns the first matching userobject.
+ * i.e. {firstname: 'admin', ...}
+ * @param {*} queryObject
+ * @param {Boolean} fullUserObject decides wether the complete
+ *                                 userobject is returned
+ */
+const getUser = async (queryObject, fullUserObject = false) => {
+  const user = await User.findOne(queryObject);
+  if (!user) { return -1; } // error code -1 is returned for no user found
+  return (fullUserObject) ? user : reduceUser(user);
+};
 
 /**
  * The username and email values are unique. This Method checks those two attribute values
@@ -169,20 +182,6 @@ const deleteUser = async (username) => {
 };
 
 /**
- * Gets ONE database user through a queryObject containing attributes and
- * the corresponding filter values. Returns the first matching userobject.
- * i.e. {firstname: 'admin', ...}
- * @param {*} queryObject
- * @param {Boolean} fullUserObject decides wether the complete
- *                                 userobject is returned
- */
-const getUser = async (queryObject, fullUserObject = false) => {
-  const user = await User.findOne(queryObject);
-  if (!user) { return -1; } // error code -1 is returned for no user found
-  return (fullUserObject) ? user : reduceUser(user);
-};
-
-/**
  * Get all Users.
  * @param {Boolean} fullUserObject decides wether the complete
  *                                 userobjects are returned
@@ -239,8 +238,8 @@ const authenticateUserByJWT = async (token) => new Promise((resolve, reject) => 
  * @param {String} _id
  * @param {String} eventID
  */
-const checkRole = async (_id, eventID) => {
-  const user = await User.findById(_id);
+const checkRole = async (id, eventID) => {
+  const user = await User.findById({ _id: id });
   if (!user) { return -1; }
   let role = -2;
   // go through the list of the user events and match the event id to extract the role
